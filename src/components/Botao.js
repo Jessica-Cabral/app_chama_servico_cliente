@@ -1,15 +1,14 @@
 
-import React from 'react';
+ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { CORES, ESPACAMENTOS, TAMANHOS_FONTE } from '../constantes/Cores2';
 
 const Botao = ({ 
-  titulo, 
-  aoPressionar, 
-  estilo, 
-  estiloTexto, 
+  title, 
+  onPress, 
+  style, 
+  styleTexto, 
   variante = 'primario',
-  desabilitado = false 
+  disabled = false 
 }) => {
   const obterEstiloBotao = () => {
     switch (variante) {
@@ -36,14 +35,14 @@ const Botao = ({
       style={[
         styles.botaoBase,
         obterEstiloBotao(),
-        desabilitado && styles.botaoDesabilitado,
-        estilo
+        disabled && styles.botaoDesabilitado,
+        style
       ]}
-      onPress={aoPressionar}
-      disabled={desabilitado}
+      onPress={onPress}
+      disabled={disabled}
     >
-      <Text style={[obterEstiloTexto(), estiloTexto]}>
-        {titulo}
+      <Text style={[obterEstiloTexto(), styleTexto]}>
+        {title}
       </Text>
     </TouchableOpacity>
   );
@@ -51,34 +50,34 @@ const Botao = ({
 
 const styles = StyleSheet.create({
   botaoBase: {
-    paddingVertical: ESPACAMENTOS.MEDIO,
-    paddingHorizontal: ESPACAMENTOS.GRANDE,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: 'center',
   },
   botaoPrimario: {
-    backgroundColor: CORES.PRIMARIA,
+    backgroundColor:'#f5a522',
   },
   botaoSecundario: {
-    backgroundColor: CORES.SECUNDARIA,
+    backgroundColor: '#283579',
   },
   botaoOutline: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: CORES.PRIMARIA,
+    borderColor: '#f5a522',
   },
   botaoDesabilitado: {
     opacity: 0.5,
   },
   textoBotao: {
-    color: CORES.BRANCA,
-    fontSize: TAMANHOS_FONTE.GRANDE,
-    fontWeight: 'bold',
+    color: '#FFF',
+    fontSize: 16,
+
   },
   textoOutline: {
-    color: CORES.PRIMARIA,
-    fontSize: TAMANHOS_FONTE.GRANDE,
-    fontWeight: 'bold',
+    color: '#f5a522',
+    fontSize: 16,
+
   },
 });
 

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,11 +12,12 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { CORES, ESPACAMENTOS, TAMANHOS_FONTE } from '../constantes/Cores2';
-import Botao from '../componentes/Botao';
-import CampoTexto from '../componentes/CampoTexto';
+import Botao from '../components/Botao';
+import Input from '../components/Input';
 
-const TelaLogin = ({ navigation }) => {
+
+const Login = ({ navigation }) => {
+  console.log('Iniciando renderização do App');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
@@ -32,7 +33,7 @@ const TelaLogin = ({ navigation }) => {
   };
 
   return (
-    <LinearGradient colors={CORES.FUNDO_GRADIENTE} style={styles.container}>
+    <LinearGradient colors={['#0a112e', '#283579']} style={styles.container}>
       <KeyboardAvoidingView
         //behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardContainer}
@@ -43,11 +44,11 @@ const TelaLogin = ({ navigation }) => {
               style={styles.botaoVoltar}
               onPress={() => navigation.goBack()}
             >
-              <Ionicons name="arrow-back" size={24} color={CORES.BRANCA} />
+              <Ionicons name="arrow-back" size={24} color='#FFF' />
             </TouchableOpacity>
             
             <View style={styles.logoContainer}>
-              <Ionicons name="construct" size={32} color={CORES.BRANCA} />
+              <Ionicons name="construct" size={32} color='#FFF' />
               <Text style={styles.logoTexto}>Chama Serviços</Text>
             </View>
           </View>
@@ -59,7 +60,7 @@ const TelaLogin = ({ navigation }) => {
             </Text>
 
             <View style={styles.formulario}>
-              <CampoTexto
+              <Input
                 rotulo="E-mail"
                 valor={email}
                 aoMudar={setEmail}
@@ -68,7 +69,7 @@ const TelaLogin = ({ navigation }) => {
                 obrigatorio
               />
 
-              <CampoTexto
+              <Input
                 rotulo="Senha"
                 valor={senha}
                 aoMudar={setSenha}
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: ESPACAMENTOS.GRANDE,
+    padding: 24,
     paddingTop: 50,
   },
   botaoVoltar: {
@@ -132,40 +133,40 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: ESPACAMENTOS.PEQUENO,
+    gap: 8,
     flex: 1,
     justifyContent: 'center',
     marginRight: 40,
   },
   logoTexto: {
-    fontSize: TAMANHOS_FONTE.TITULO,
-    fontWeight: 'bold',
-    color: CORES.BRANCA,
+    fontSize: 24,
+
+    color: '#FFF',
   },
   containerFormulario: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: ESPACAMENTOS.GRANDE,
+    paddingHorizontal: 24,
   },
   titulo: {
-    fontSize: TAMANHOS_FONTE.TITULO_GRANDE,
-    fontWeight: 'bold',
-    color: CORES.BRANCA,
+    fontSize: 32,
+
+    color: '#FFF',
     textAlign: 'center',
-    marginBottom: ESPACAMENTOS.PEQUENO,
+    marginBottom: 8,
   },
   subtitulo: {
-    fontSize: TAMANHOS_FONTE.GRANDE,
-    color: CORES.BRANCA,
+    fontSize: 16,
+    color: '#FFF',
     textAlign: 'center',
     opacity: 0.9,
-    marginBottom: ESPACAMENTOS.EXTRA_GRANDE,
+    marginBottom: 32,
   },
   formulario: {
-    backgroundColor: CORES.BRANCA,
+    backgroundColor: '#FFF',
     borderRadius: 12,
-    padding: ESPACAMENTOS.GRANDE,
-    shadowColor: CORES.PRETA,
+    padding: 24,
+    shadowColor: '#0a112e',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -176,30 +177,30 @@ const styles = StyleSheet.create({
   },
   linkEsqueceuSenha: {
     alignSelf: 'flex-end',
-    marginBottom: ESPACAMENTOS.GRANDE,
+    marginBottom: 24,
   },
   textoEsqueceuSenha: {
-    color: CORES.PRIMARIA,
-    fontSize: TAMANHOS_FONTE.PEQUENO,
+    color: '#f5a522',
+    fontSize: 12,
   },
   botaoLogin: {
-    marginBottom: ESPACAMENTOS.GRANDE,
+    marginBottom: 24,
   },
   containerCadastro: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: ESPACAMENTOS.PEQUENO / 2,
+    gap: 8 / 2,
   },
   textoCadastro: {
-    color: CORES.CINZA,
-    fontSize: TAMANHOS_FONTE.MEDIO,
+    color:'#4e5264',
+    fontSize: 14,
   },
   linkCadastro: {
-    color: CORES.PRIMARIA,
-    fontSize: TAMANHOS_FONTE.MEDIO,
-    fontWeight: 'bold',
+    color: '#f5a522',
+    fontSize: 14,
+
   },
 });
 
-export default TelaLogin;
+export default Login;
