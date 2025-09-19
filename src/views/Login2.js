@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,31 +9,29 @@ import {
   Alert,
   TouchableOpacity,
   Image,
-} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import Botao from "../components/Botao";
-import Input from "../components/Input";
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import Botao from '../components/Botao';
+import Input from '../components/Input';
+import logochama from '../assets/images/logochama.png'; // ajuste o caminho conforme necessário
 
 const Login = ({ navigation }) => {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
 
   const manipularLogin = () => {
     if (!email || !senha) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos");
+      Alert.alert('Erro', 'Por favor, preencha todos os campos');
       return;
     }
-    onPress: () => navigation.navigate("TelaInicial");
-    // Alert.alert('Sucesso', 'Login realizado com sucesso!', [
-    //   { text: 'OK', onPress: () => navigation.navigate('TelaSelecionarPerfil') }
-    // ]);
+    navigation.navigate('TelaInicial');
   };
 
   return (
-    <LinearGradient colors={["#0a112e", "#283579"]} style={styles.container}>
+    <LinearGradient colors={['#0a112e', '#283579']} style={styles.container}>
       <KeyboardAvoidingView
-        //behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardContainer}
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -46,24 +44,17 @@ const Login = ({ navigation }) => {
             </TouchableOpacity>
 
             <View style={styles.logoContainer}>
-              <Image
-                source={"../assets/images/logochama.png"}
-                style={styles.logoImagem}
-                resizeMode="contain"
-              />
+              <Image source={logochama} style={styles.logoImagem} resizeMode="contain" />
             </View>
           </View>
-          
 
           <View style={styles.containerFormulario}>
+            <Text style={styles.titulo}>Bem-vindo!</Text>
+            <Text style={styles.subtitulo}>
+              Acesse sua conta para usar o sistema
+            </Text>
+
             <View style={styles.formulario}>
-              <View>
-                <Text style={styles.titulo}>Bem-vindo!</Text>
-                <Text style={styles.subtitulo}>
-                  Acesse sua conta para usar o sistema
-                </Text>
-              </View>
-              <Text>E-mail</Text>
               <Input
                 rotulo="E-mail"
                 valor={email}
@@ -72,7 +63,7 @@ const Login = ({ navigation }) => {
                 tipoTeclado="email-address"
                 obrigatorio
               />
-              <Text>Senha</Text>
+
               <Input
                 rotulo="Senha"
                 valor={senha}
@@ -90,16 +81,15 @@ const Login = ({ navigation }) => {
 
               <Botao
                 titulo="Entrar"
-                //aoPressionar={manipularLogin}
-                aoPressionar={() => navigation.navigate("TelaInicial")}
+                aoPressionar={manipularLogin}
                 style={styles.botaoLogin}
               />
 
               <View style={styles.containerCadastro}>
-                <Text style={styles.textoCadastro}>Não tem uma conta?</Text>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("TelaCadastro")}
-                >
+                <Text style={styles.textoCadastro}>
+                  Não tem uma conta?
+                </Text>
+                <TouchableOpacity onPress={() => navigation.navigate('CadastroCliente')}>
                   <Text style={styles.linkCadastro}>Cadastre-se aqui</Text>
                 </TouchableOpacity>
               </View>
@@ -122,90 +112,84 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   cabecalho: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
     paddingTop: 50,
   },
   botaoVoltar: {
     width: 40,
     height: 40,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   logoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
     flex: 1,
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 40,
-  },
-  logoTexto: {
-    fontSize: 24,
-    color: "#FFF",
   },
   logoImagem: {
     width: 160,
     height: 50,
   },
-
   containerFormulario: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingHorizontal: 24,
+    marginVertical: 32,
   },
   titulo: {
-    fontSize: 24,
-    color: "#0a112e",
-    fontWeight:'bold',
-    textAlign: "center",
+    fontSize: 32,
+    color: '#FFF',
+    textAlign: 'center',
     marginBottom: 8,
   },
   subtitulo: {
     fontSize: 16,
-    color: '#4e5264',
-    textAlign: "center",
+    color: '#FFF',
+    textAlign: 'center',
     opacity: 0.9,
     marginBottom: 32,
   },
   formulario: {
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     borderRadius: 12,
     padding: 24,
-    shadowColor: "#0a112e",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowColor: '#0a112e',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
   },
   linkEsqueceuSenha: {
-    alignSelf: "flex-end",
+    alignSelf: 'flex-end',
     marginBottom: 24,
   },
   textoEsqueceuSenha: {
-    color: "#f5a522",
+    color: '#f5a522',
     fontSize: 12,
   },
   botaoLogin: {
+    backgroundColor: '#f5a522',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
     marginBottom: 24,
   },
   containerCadastro: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8 / 2,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4,
   },
   textoCadastro: {
-    color: "#4e5264",
+    color: '#4e5264',
     fontSize: 14,
   },
   linkCadastro: {
-    color: "#f5a522",
+    color: '#f5a522',
     fontSize: 14,
   },
 });
