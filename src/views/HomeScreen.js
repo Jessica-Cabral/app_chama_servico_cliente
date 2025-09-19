@@ -1,13 +1,8 @@
  import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,7 +16,7 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.containerBotaoEntrar}>
           <Botao
             title="Entrar"
-            onPress={() => navigation.navigate("TelaLogin")}
+            onPress={() => navigation.navigate("Login")}
             style={styles.botaoEntrar}
           />
         </View>
