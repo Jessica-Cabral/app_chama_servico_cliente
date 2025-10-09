@@ -1,59 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
-  Platform,
-  Alert,
   TouchableOpacity,
-  Image,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import Botao from "../components/Botao";
-import Input from "../components/Input";
+import InputCampo from "../components/InputCampo";
+import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
+
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const { login } = useContext(AuthContext);
 
-  const manipularLogin = () => {
+  const manipularLogin = async () => {
     if (!email || !senha) {
       Alert.alert("Erro", "Por favor, preencha todos os campos");
       return;
     }
-    onPress: () => navigation.navigate("TelaInicial");
-    // Alert.alert('Sucesso', 'Login realizado com sucesso!', [
-    //   { text: 'OK', onPress: () => navigation.navigate('TelaSelecionarPerfil') }
-    // ]);
+
+    try {
+      const response = await axios.post("https://chamaservico.tds104-senac.online/api/cliente/auth", {
+        email,
+        senha,
+      });
+
+      if (response.data.sucesso) {
+        await login({ token: response.data.token, usuario: response.data.usuario }); // salva token JWT e dados do usuário
+        navigation.replace("MainTabs"); // redireciona para as abas
+      } else {
+        Alert.alert("Erro", response.data.erro || "Credenciais inválidas");
+      }
+    } catch (error) {
+      console.error("Erro na autenticação:", error);
+      Alert.alert("Erro", "Não foi possível conectar ao servidor");
+    }
   };
 
   return (
     <LinearGradient colors={["#0a112e", "#283579"]} style={styles.container}>
-      <KeyboardAvoidingView
-        //behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardContainer}
-      >
+      <KeyboardAvoidingView style={styles.keyboardContainer}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.cabecalho}>
-            <TouchableOpacity
-              style={styles.botaoVoltar}
-              onPress={() => navigation.goBack()}
-            >
-              <Ionicons name="arrow-back" size={24} color="#FFF" />
-            </TouchableOpacity>
-
-            <View style={styles.logoContainer}>
-              <Image
-                source={"../assets/images/logochama.png"}
-                style={styles.logoImagem}
-                resizeMode="contain"
-              />
+            <View style={styles.logoLinha}>
+              <Text style={styles.textoLogo}>CHAMA</Text>
+              <Text style={styles.textoLogoServico}>SERVIÇO</Text>
             </View>
           </View>
-          
 
           <View style={styles.containerFormulario}>
             <View style={styles.formulario}>
@@ -63,43 +64,40 @@ const Login = ({ navigation }) => {
                   Acesse sua conta para usar o sistema
                 </Text>
               </View>
-              <Text>E-mail</Text>
-              <Input
-                rotulo="E-mail"
-                valor={email}
-                aoMudar={setEmail}
+
+              <InputCampo
+                label="E-mail"
+                value={email}
+                onChangeText={setEmail}
                 placeholder="Digite seu e-mail"
-                tipoTeclado="email-address"
-                obrigatorio
-              />
-              <Text>Senha</Text>
-              <Input
-                rotulo="Senha"
-                valor={senha}
-                aoMudar={setSenha}
-                placeholder="Digite sua senha"
-                seguro
-                obrigatorio
+                secureTextEntry={false}
+                icone={<Ionicons name="mail-outline" size={20} color="#283579" />}
               />
 
-              <TouchableOpacity style={styles.linkEsqueceuSenha}>
-                <Text style={styles.textoEsqueceuSenha}>
-                  Esqueceu sua senha?
-                </Text>
+              <InputCampo
+                label="Senha"
+                value={senha}
+                onChangeText={setSenha}
+                placeholder="Digite sua senha"
+                secureTextEntry={true}
+                icone={<Ionicons name="lock-closed-outline" size={20} color="#283579" />}
+              />
+
+              <TouchableOpacity style={styles.linkEsqueceuSenha} 
+                onPress={() => navigation.navigate("NovaSolicitacao")}>
+                <Text style={styles.textoEsqueceuSenha}>Esqueceu sua senha?</Text>
               </TouchableOpacity>
 
               <Botao
-                titulo="Entrar"
-                //aoPressionar={manipularLogin}
-                aoPressionar={() => navigation.navigate("TelaInicial")}
+                title="Entrar"
+                onPress={manipularLogin}
                 style={styles.botaoLogin}
+                styleTexto={styles.textoBotao}
               />
 
               <View style={styles.containerCadastro}>
                 <Text style={styles.textoCadastro}>Não tem uma conta?</Text>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("TelaCadastro")}
-                >
+                <TouchableOpacity onPress={() => navigation.navigate("CadastroCliente")}>
                   <Text style={styles.linkCadastro}>Cadastre-se aqui</Text>
                 </TouchableOpacity>
               </View>
@@ -112,7 +110,7 @@ const Login = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+    container: {
     flex: 1,
   },
   keyboardContainer: {
@@ -122,44 +120,37 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   cabecalho: {
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    padding: 24,
-    paddingTop: 50,
-  },
-  botaoVoltar: {
-    width: 40,
-    height: 40,
     justifyContent: "center",
-    alignItems: "center",
+    padding: 24,
+    paddingTop: 120,
+    marginBottom: 32,
   },
-  logoContainer: {
+  logoLinha: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    flex: 1,
-    justifyContent: "center",
-    marginRight: 40,
   },
-  logoTexto: {
-    fontSize: 24,
+  textoLogo: {
+    fontSize: 32,
     color: "#FFF",
+    fontWeight: "bold",
   },
-  logoImagem: {
-    width: 160,
-    height: 50,
+  textoLogoServico: {
+    fontSize: 32,
+    color: "#f5a522",
+    fontWeight: "bold",
+    marginLeft: 8,
   },
-
   containerFormulario: {
-    flex: 1,
+
     justifyContent: "center",
     paddingHorizontal: 24,
   },
   titulo: {
     fontSize: 24,
     color: "#0a112e",
-    fontWeight:'bold',
+    fontWeight: 'bold',
     textAlign: "center",
     marginBottom: 8,
   },
@@ -193,12 +184,13 @@ const styles = StyleSheet.create({
   },
   botaoLogin: {
     marginBottom: 24,
+    color:"#fff"
   },
   containerCadastro: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: 8 / 2,
+    gap: 4,
   },
   textoCadastro: {
     color: "#4e5264",
