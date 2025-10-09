@@ -1,7 +1,8 @@
 // API para gerenciar a autenticação dos cliente
 
 
-const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/auth.php';
+//const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/auth.php';
+const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php';
 const { token } = useContext(AuthContext);
 
 export async function autenticarCliente(email, senha) {

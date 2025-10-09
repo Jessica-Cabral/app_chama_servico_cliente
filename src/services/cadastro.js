@@ -1,5 +1,7 @@
 // API para cadastro de cliente
-const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/cadastro.php';
+//const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/cadastro.php';
+const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php';
+
 const { token } = useContext(AuthContext);
 
 export async function cadastrarCliente(nome, email, senha, confirmar_senha) {

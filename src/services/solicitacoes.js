@@ -1,6 +1,8 @@
 // Api para gerenciamento das solicitações de serviço
-const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/solicitacoes.php';
-const UPLOAD_URL = 'https://chamaservico.tds104-senac.online/api/cliente/upload_imagem_solicitacao.php';
+const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php';
+
+//const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/solicitacoes.php';
+//const UPLOAD_URL = 'https://chamaservico.tds104-senac.online/api/cliente/upload_imagem_solicitacao.php';
 const { token } = useContext(AuthContext);
 
 export async function listarSolicitacoes(cliente_id, filtros = {}) {

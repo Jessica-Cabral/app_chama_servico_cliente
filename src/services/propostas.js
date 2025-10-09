@@ -1,5 +1,7 @@
 //Api para gestão das propostas recebidas e aceitação
-const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/propostas.php';
+//const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/propostas.php';
+const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php';
+
 const { token } = useContext(AuthContext);
 
 export async function buscarPropostas(cliente_id, filtros = {}) {
