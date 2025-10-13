@@ -15,9 +15,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import Botao from "../components/Botao";
 import InputCampo from "../components/InputCampo";
-import axios from "axios";
 
-//import { cadastrarCliente } from "../services/cadastro";
 
 const CadastroCliente = ({ navigation }) => {
   //acessar token
@@ -26,37 +24,20 @@ const CadastroCliente = ({ navigation }) => {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [novaSenha, setNovaSenha] = useState("");
+
+  const [confirmar_senha, setConfirmar_senha] = useState("");
 
   const manipularCadastro = async () => {
-    if (!nome || !email || !senha) {
+    //valida se todos os campos obrigatórios foram preenchidos
+    if (!nome || !email || !senha || !confirmar_senha) {
       Alert.alert("Erro", "Preencha todos os campos obrigatórios.");
       return;
-    } else {
-      if (senha != confirmar_senha)
-        Alert.alert("Senhas não são iguais. Digite a senha novamente");
+    }
+    //verifica se as senhas são iguais.
+    if (senha !== confirmar_senha) {
+      Alert.alert("Erro", "As senhas não coincidem. Digite a senha novamente.");
       return;
     }
-
-    //   try {
-    //     const response = await axios.post("https://chamaservico.tds104-senac.online/api/cliente/ClienteApi/registro.php", {
-    //       nome,
-    //       email,
-    //       senha,
-    //       novaSenha,
-    //       tipo: "cliente", // fixo para cliente
-    //     });
-
-    //     if (response.data.sucesso) {
-    //       Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
-    //       navigation.replace("PerfilCliente");
-    //     } else {
-    //       Alert.alert("Erro", response.data.erro || "Erro ao cadastrar.");
-    //     }
-    //   } catch (error) {
-    //     console.error("Erro no cadastro:", error);
-    //     Alert.alert("Erro", "Não foi possível conectar ao servidor.");
-    //   }
     
     const resultado = await cadastrarCliente(nome, email, senha, novaSenha, token);
 
@@ -118,8 +99,8 @@ const CadastroCliente = ({ navigation }) => {
 
               <InputCampo
                 label="Confirmar Senha"
-                value={novaSenha}
-                onChangeText={setNovaSenha}
+                value={confirmar_senha}
+                onChangeText={setConfirmar_senha}
                 placeholder="Confirme a senha"
                 secureTextEntry={true}
                 icone={<Ionicons name="lock-closed-outline" size={20} color="#283579" />}
