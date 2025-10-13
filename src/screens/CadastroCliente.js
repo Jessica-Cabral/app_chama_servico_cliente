@@ -1,5 +1,7 @@
 //Formulario de cadastro
-import React, { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { cadastrarCliente } from "../services/cadastro";
 import {
   View,
   Text,
@@ -15,7 +17,12 @@ import Botao from "../components/Botao";
 import InputCampo from "../components/InputCampo";
 import axios from "axios";
 
+//import { cadastrarCliente } from "../services/cadastro";
+
 const CadastroCliente = ({ navigation }) => {
+  //acessar token
+  const {token} = useContext(AuthContext)
+  //parâmentos utilizados
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -25,27 +32,42 @@ const CadastroCliente = ({ navigation }) => {
     if (!nome || !email || !senha) {
       Alert.alert("Erro", "Preencha todos os campos obrigatórios.");
       return;
+    } else {
+      if (senha != confirmar_senha)
+        Alert.alert("Senhas não são iguais. Digite a senha novamente");
+      return;
     }
 
-    try {
-      const response = await axios.post("https://chamaservico.tds104-senac.online", {
-        nome,
-        email,
-        senha,
-        novaSenha,
-        tipo: "cliente", // fixo para cliente
-      });
+    //   try {
+    //     const response = await axios.post("https://chamaservico.tds104-senac.online/api/cliente/ClienteApi/registro.php", {
+    //       nome,
+    //       email,
+    //       senha,
+    //       novaSenha,
+    //       tipo: "cliente", // fixo para cliente
+    //     });
 
-      if (response.data.sucesso) {
-        Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
-        navigation.replace("Login");
-      } else {
-        Alert.alert("Erro", response.data.erro || "Erro ao cadastrar.");
-      }
-    } catch (error) {
-      console.error("Erro no cadastro:", error);
-      Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+    //     if (response.data.sucesso) {
+    //       Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
+    //       navigation.replace("PerfilCliente");
+    //     } else {
+    //       Alert.alert("Erro", response.data.erro || "Erro ao cadastrar.");
+    //     }
+    //   } catch (error) {
+    //     console.error("Erro no cadastro:", error);
+    //     Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+    //   }
+    
+    const resultado = await cadastrarCliente(nome, email, senha, novaSenha, token);
+
+    if (resultado.sucesso) {
+      Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
+      navigation.replace("PerfilCliente");
+    } else {
+      Alert.alert("Erro", resultado.erro || "Erro ao cadastrar.");
     }
+  
+
   };
 
   return (
@@ -99,13 +121,14 @@ const CadastroCliente = ({ navigation }) => {
                 value={novaSenha}
                 onChangeText={setNovaSenha}
                 placeholder="Confirme a senha"
-                secureTextEntry={false}
+                secureTextEntry={true}
                 icone={<Ionicons name="lock-closed-outline" size={20} color="#283579" />}
               />
 
               <Botao
                 title="Cadastrar"
                 onPress={manipularCadastro}
+                //onPress={cadastrarCliente}
                 style={styles.botaoLogin}
                 styleTexto={styles.textoBotao}
               />

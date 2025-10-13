@@ -12,6 +12,7 @@ export default function InputCampo({ label, value, onChangeText, placeholder, ed
         placeholder={placeholder}
         editable={editable}
         secureTextEntry={secureTextEntry}
+        //icons ={icone}
       />
     </View>
   );

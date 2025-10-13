@@ -3,7 +3,7 @@
 //const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/enderecos.php';
 const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php';
 
-const { token } = useContext(AuthContext);
+//const { token } = useContext(AuthContext);
 
 export async function listarEnderecos(cliente_id) {
   try {

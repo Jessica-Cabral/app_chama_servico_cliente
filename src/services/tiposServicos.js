@@ -2,7 +2,7 @@
 const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php';
 
 //const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/tipos_servicos.php';
-const { token } = useContext(AuthContext);
+//const { token } = useContext(AuthContext);
 
 export async function listarTiposServicos() {
   try {

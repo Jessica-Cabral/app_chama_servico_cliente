@@ -28,7 +28,7 @@ const Login = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post("https://chamaservico.tds104-senac.online/api/cliente/auth", {
+      const response = await axios.post("hhttps://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/login", {
         email,
         senha,
       });
