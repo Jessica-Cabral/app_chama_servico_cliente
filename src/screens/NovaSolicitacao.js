@@ -143,6 +143,16 @@ export default function NovaSolicitacao1({ route, navigation }) {
       }
       Alert.alert("Sucesso", solicitacao ? "Solicitação atualizada!" : "Solicitação publicada!");
       navigation.navigate("MinhasSolicitacoes");
+      // Limpar formulário
+      setTipoServicoId('');
+      setEnderecoId('');
+      setTitulo('');
+      setDescricao('');
+      setOrcamento('');
+      setDataAtendimento('');
+      setUrgencia('normal');
+      setImagens([]);
+      setResumo(null);
     } else {
       Alert.alert("Erro", resultado.erro ?? "Erro ao salvar solicitação.");
     }
