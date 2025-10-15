@@ -35,7 +35,8 @@ export async function criarSolicitacao(
         'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
-        dados
+        cliente_id: dados.cliente_id,
+        ...dados
       })
     });
 
