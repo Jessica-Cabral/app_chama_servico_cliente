@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from '../context/AuthContext';
-import clienteApi from '../services/clienteApi';
+import { consultarPerfil, atualizarPerfil } from '../services/perfil';
 import EnderecoCard from '../components/EnderecoCard';
 import FotoPerfilUploader from '../components/FotoPerfilUploader';
 import InputCampo from '../components/InputCampo';
@@ -19,10 +19,12 @@ export default function PerfilCliente() {
   useEffect(() => {
     async function carregarPerfil() {
       if (!usuario?.id) return;
-      const response = await clienteApi.buscarPerfil(usuario.id);
+      const response = await consultarPerfil(usuario.id, token);
       if (response.sucesso) {
         setPerfil(response.perfil);
         setEnderecos(response.enderecos);
+      } else {
+        Alert.alert('Erro', response.erro || 'Não foi possível carregar o perfil');
       }
     }
     carregarPerfil();
@@ -30,12 +32,12 @@ export default function PerfilCliente() {
 
   const handleSalvar = async () => {
     if (novaSenha && novaSenha !== confirmarSenha) {
-      alert('As senhas não coincidem');
+      Alert.alert('Erro', 'As senhas não coincidem');
       return;
     }
 
     try {
-      const response = await clienteApi.atualizarPerfil(
+      const response = await atualizarPerfil(
         usuario.id,
         perfil.nome,
         perfil.email,
@@ -46,19 +48,19 @@ export default function PerfilCliente() {
       );
 
       if (response.sucesso) {
-        alert('Perfil atualizado com sucesso!');
+        Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
         setEditando(false);
       } else {
-        alert(response.erro || 'Erro ao atualizar perfil');
+        Alert.alert('Erro', response.erro || 'Erro ao atualizar perfil');
       }
     } catch (error) {
-      alert('Erro inesperado ao atualizar perfil');
+      Alert.alert('Erro', 'Erro inesperado ao atualizar perfil');
       console.error(error);
     }
   };
 
   return (
-    <LinearGradient colors={['#0a112e', '#283579']} style={styles.container}>
+    <LinearGradient colors={['#283579', '#283579']} style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.card}>
           <FotoPerfilUploader fotoAtual={perfil.foto_perfil} />
