@@ -1,6 +1,7 @@
 // API para consulta e atualização do perfil do cliente
 //const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/Perfil.php';
 const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/perfil';
+const ENDERECO_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/enderecos';
 
 //const { token } = useContext(AuthContext);
 
@@ -36,5 +37,27 @@ export async function atualizarPerfil(cliente_id, nome, email, telefone, cpf, dt
     return data;
   } catch (error) {
     return { erro: 'Erro ao atualizar perfil' };
+  }
+}
+
+
+export async function definirEnderecoPrincipal(cliente_id, endereco_id, token) {
+  try {
+    const response = await fetch(ENDERECO_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        cliente_id,
+        endereco_id,
+        principal: 1
+      })
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return { erro: 'Erro ao definir endereço principal' };
   }
 }

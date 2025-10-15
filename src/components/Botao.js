@@ -17,6 +17,8 @@ const Botao = ({
         return styles.botaoSecundario;
       case 'outline':
         return styles.botaoOutline;
+      case 'escuro':
+        return styles.botaoEscuro;
       default:
         return styles.botaoPrimario;
     }
@@ -64,6 +66,10 @@ const styles = StyleSheet.create({
   botaoSecundario: {
     backgroundColor: '#283579',
   },
+   botaoEscuro: {
+    backgroundColor: '#0a112e',
+  },
+  
   botaoOutline: {
     backgroundColor: 'transparent',
     borderWidth: 1,

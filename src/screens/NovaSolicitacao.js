@@ -164,7 +164,7 @@ export default function NovaSolicitacao1({ route, navigation }) {
   };
 
   return (
-    <LinearGradient colors={["#0a112e", "#0a112e"]} style={styles.container}>
+  <LinearGradient colors={["#283579","#0a112e"]} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <Text style={styles.titulo}>
           {solicitacao ? "Editar Solicitação" : "Nova Solicitação"}
@@ -271,7 +271,7 @@ export default function NovaSolicitacao1({ route, navigation }) {
           variante="primario"
         />
       </ScrollView>
-    </LinearGradient>
+  </LinearGradient>
   );
 }
 

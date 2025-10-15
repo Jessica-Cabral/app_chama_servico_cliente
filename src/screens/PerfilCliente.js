@@ -3,6 +3,11 @@ import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from '../context/AuthContext';
 import { consultarPerfil, atualizarPerfil } from '../services/perfil';
+import {
+  listarEnderecos,
+  definirEnderecoPrincipal,
+  excluirEndereco
+} from '../services/enderecos';
 import EnderecoCard from '../components/EnderecoCard';
 import FotoPerfilUploader from '../components/FotoPerfilUploader';
 import InputCampo from '../components/InputCampo';
@@ -17,18 +22,27 @@ export default function PerfilCliente() {
   const [confirmarSenha, setConfirmarSenha] = useState('');
 
   useEffect(() => {
-    async function carregarPerfil() {
-      if (!usuario?.id) return;
-      const response = await consultarPerfil(usuario.id, token);
-      if (response.sucesso) {
-        setPerfil(response.perfil);
-        setEnderecos(response.enderecos);
-      } else {
-        Alert.alert('Erro', response.erro || 'Não foi possível carregar o perfil');
-      }
+    if (usuario?.id && token) {
+      carregarDados();
     }
-    carregarPerfil();
-  }, [usuario]);
+  }, [usuario, token]);
+
+  const carregarDados = async () => {
+    const perfilResponse = await consultarPerfil(usuario.id, token);
+    const enderecosResponse = await listarEnderecos(usuario.id, token);
+
+    if (perfilResponse.sucesso) {
+      setPerfil(perfilResponse.perfil);
+    } else {
+      Alert.alert('Erro', perfilResponse.erro || 'Não foi possível carregar o perfil');
+    }
+
+    if (enderecosResponse.sucesso) {
+      setEnderecos(enderecosResponse.enderecos);
+    } else {
+      Alert.alert('Erro', enderecosResponse.erro || 'Não foi possível carregar os endereços');
+    }
+  };
 
   const handleSalvar = async () => {
     if (novaSenha && novaSenha !== confirmarSenha) {
@@ -36,31 +50,47 @@ export default function PerfilCliente() {
       return;
     }
 
-    try {
-      const response = await atualizarPerfil(
-        usuario.id,
-        perfil.nome,
-        perfil.email,
-        perfil.telefone,
-        perfil.cpf,
-        perfil.dt_nascimento,
-        token
-      );
+    const response = await atualizarPerfil(
+      usuario.id,
+      perfil.nome,
+      perfil.email,
+      perfil.telefone,
+      perfil.cpf,
+      perfil.dt_nascimento,
+      token
+    );
 
-      if (response.sucesso) {
-        Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
-        setEditando(false);
-      } else {
-        Alert.alert('Erro', response.erro || 'Erro ao atualizar perfil');
-      }
-    } catch (error) {
-      Alert.alert('Erro', 'Erro inesperado ao atualizar perfil');
-      console.error(error);
+    if (response.sucesso) {
+      Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
+      setEditando(false);
+      carregarDados();
+    } else {
+      Alert.alert('Erro', response.erro || 'Erro ao atualizar perfil');
+    }
+  };
+
+  const handleDefinirPrincipal = async (enderecoId) => {
+    const response = await definirEnderecoPrincipal(usuario.id, enderecoId,token);
+    if (response.sucesso) {
+      Alert.alert('Sucesso', 'Endereço definido como principal');
+      carregarDados();
+    } else {
+      Alert.alert('Erro', response.erro || 'Não foi possível atualizar');
+    }
+  };
+
+  const handleExcluirEndereco = async (enderecoId) => {
+    const response = await excluirEndereco(usuario.id, enderecoId,token);
+    if (response.sucesso) {
+      Alert.alert('Sucesso', 'Endereço excluído com sucesso');
+      carregarDados();
+    } else {
+      Alert.alert('Erro', response.erro || 'Não foi possível excluir');
     }
   };
 
   return (
-    <LinearGradient colors={['#283579', '#283579']} style={styles.container}>
+    <LinearGradient colors={['#0a112e', '#283579']} style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.card}>
           <FotoPerfilUploader fotoAtual={perfil.foto_perfil} />
@@ -139,9 +169,14 @@ export default function PerfilCliente() {
         </View>
 
         <View style={styles.enderecos}>
-          <InputCampo label="Endereços" value="" editable={false} />
+          <InputCampo style={styles.inputEndereco} label="Meus Endereços" value="" editable={false} />
           {enderecos.map((endereco) => (
-            <EnderecoCard key={endereco.id} endereco={endereco} />
+            <EnderecoCard
+              key={endereco.id}
+              endereco={endereco}
+              onDefinirPrincipal={handleDefinirPrincipal}
+              onExcluir={handleExcluirEndereco}
+            />
           ))}
         </View>
       </ScrollView>
@@ -170,4 +205,6 @@ const styles = StyleSheet.create({
   enderecos: {
     marginTop: 24,
   },
+ 
+  
 });

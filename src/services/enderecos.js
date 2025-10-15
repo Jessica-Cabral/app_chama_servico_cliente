@@ -44,12 +44,13 @@ export async function cadastrarEndereco(cliente_id, cep, numero, complemento, pr
   }
 }
 
-export async function definirEnderecoPrincipal(cliente_id, endereco_id) {
+export async function definirEnderecoPrincipal(cliente_id, endereco_id, token) {
   try {
     const response = await fetch(API_URL, {
-      method: 'PUT',
+      method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ cliente_id, endereco_id })
     });
@@ -61,12 +62,13 @@ export async function definirEnderecoPrincipal(cliente_id, endereco_id) {
   }
 }
 
-export async function excluirEndereco(cliente_id, endereco_id) {
+export async function excluirEndereco(cliente_id, endereco_id, token) {
   try {
     const response = await fetch(API_URL, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ cliente_id, endereco_id })
     });

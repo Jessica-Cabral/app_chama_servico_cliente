@@ -1,15 +1,43 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import Botao from './Botao';
 
-export default function EnderecoCard({ endereco }) {
+export default function EnderecoCard({ endereco, onDefinirPrincipal, onExcluir }) {
+  const confirmarExclusao = () => {
+    Alert.alert(
+      'Confirmar exclusão',
+      'Tem certeza que deseja excluir este endereço?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Excluir', style: 'destructive', onPress: () => onExcluir(endereco.id) }
+      ]
+    );
+  };
+
   return (
     <View style={styles.card}>
-      <Text style={styles.text}>{endereco.logradouro}, {endereco.numero}</Text>
-      <Text style={styles.text}>{endereco.bairro} - {endereco.cidade}/{endereco.estado}</Text>
-      <Text style={styles.text}>CEP: {endereco.cep}</Text>
-      <View style={styles.actions}>
-        <Button title="Editar" onPress={() => {}} color="#283579" />
-        <Button title="Excluir" onPress={() => {}} color="#EF4444" />
+      <Text style={styles.texto}>{endereco.logradouro}, {endereco.numero}</Text>
+      <Text style={styles.texto}>{endereco.bairro}</Text>
+      <Text style={styles.texto}>{endereco.cidade}/{endereco.estado}</Text>
+      <Text style={styles.texto}>CEP: {endereco.cep}</Text>
+
+      {endereco.principal === 1 && (
+        <Text style={styles.flagPrincipal}>Endereço Principal</Text>
+      )}
+
+      <View style={styles.botoes}>
+        {endereco.principal !== 1 && (
+          <Botao
+            title="Definir como Principal"
+            variante="primario"
+            onPress={() => onDefinirPrincipal(endereco.id)}
+          />
+        )}
+        <Botao
+          title="Excluir"
+          variante="secundario"
+          onPress={confirmarExclusao}
+        />
       </View>
     </View>
   );
@@ -19,19 +47,33 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#f5f5f5',
     padding: 16,
-    marginVertical: 8,
-    borderRadius: 8,
-    borderColor: '#4e5264',
-    borderWidth: 1,
+    borderRadius: 10,
+    marginBottom: 12,
+    shadowColor: '#4e5264',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
-  text: {
-    fontSize: 14,
+  texto: {
     color: '#0a112e',
+    fontSize: 14,
     marginBottom: 4,
   },
-  actions: {
+  flagPrincipal: {
+    backgroundColor: '#f5a522',
+    color: '#ffffff',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+    marginTop: 8,
+    fontWeight: 'bold',
+  },
+  botoes: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 8,
+    marginTop: 12,
+    gap: 8,
   },
 });
