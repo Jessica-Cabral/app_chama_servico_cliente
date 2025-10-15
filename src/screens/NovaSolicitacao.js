@@ -10,11 +10,13 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
+
 import InputCampo from '../components/InputCampo';
 import SelectCampo from '../components/SelectCampo';
 import RadioGrupo from '../components/RadioGrupo';
 import Botao from '../components/Botao';
 import SecaoFormulario from '../components/SecaoFormulario';
+
 import { listarTiposServicos } from '../services/tiposServicos';
 import { listarEnderecos } from '../services/enderecos';
 import {
@@ -106,14 +108,19 @@ export default function NovaSolicitacao1({ route, navigation }) {
       imagens,
     });
   };
-
+  function converterParaFormatoAmericano(dataBr) {
+    const regex = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/;
+    const match = dataBr.match(regex);
+    if (!match) return dataBr;
+    const [, dia, mes, ano, hora, minuto] = match;
+    return `${ano}-${mes}-${dia} ${hora}:${minuto}:00`;
+  }
   const salvarSolicitacao = async () => {
     if (!validarCamposObrigatorios()) {
       Alert.alert("Erro", "Preencha todos os campos obrigatórios antes de publicar.");
       return;
     }
     const dados = {
-
       cliente_id,
       titulo,
       descricao,
@@ -121,17 +128,15 @@ export default function NovaSolicitacao1({ route, navigation }) {
       endereco_id: enderecoId,
       urgencia,
       orcamento_estimado: orcamento,
-      data_atendimento: dataAtendimento,
-
+      data_atendimento: converterParaFormatoAmericano(dataAtendimento),
     };
-    console.log(dados)
 
     let resultado;
     if (solicitacao?.id) {
       resultado = await atualizarSolicitacao(solicitacao.id, dados);
     } else {
       resultado = await criarSolicitacao(dados,token);
-      console.log(dados,token)
+      //console.log(dados,token)
     }
 
     if (resultado.sucesso) {
@@ -223,7 +228,9 @@ export default function NovaSolicitacao1({ route, navigation }) {
             label="Data de Atendimento"
             value={dataAtendimento}
             onChangeText={setDataAtendimento}
-            placeholder="YYYY-MM-DD"
+            placeholder="dd/mm/aaaa hh:mm"
+            tipo="datetime"
+            maxLength={16}
           />
           <RadioGrupo
             label="Urgência"
