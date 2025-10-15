@@ -25,7 +25,15 @@ import {
 
 export default function NovaSolicitacao1({ route, navigation }) {
   const { token } = useContext(AuthContext);
-  const cliente_id = route.params?.cliente_id ?? 1;
+  //usar o usuário logado para vincular aos id_cliente da solicitação
+  const { usuario, carregando } = useContext(AuthContext);
+    if (carregando) {
+      return <Text>Carregando...</Text>;
+    }
+    if (!usuario) {
+      return <Text>Usuário não autenticado</Text>;
+    }
+  const cliente_id = usuario.id;
   const solicitacao = route.params?.solicitacao ?? null;
 
   const [tiposServicos, setTiposServicos] = useState([]);
