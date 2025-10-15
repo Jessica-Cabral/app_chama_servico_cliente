@@ -2,16 +2,15 @@
 
 
 //const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/auth.php';
-const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php';
+const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/login';
 //const { token } = useContext(AuthContext);
 
-export async function autenticarCliente(email, senha,token) {
+export async function autenticarCliente(email, senha) {
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ email, senha })
     });

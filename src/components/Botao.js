@@ -1,14 +1,15 @@
+import React from 'react';
+import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 
- import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-
-const Botao = ({ 
-  title, 
-  onPress, 
-  style, 
-  styleTexto, 
+const Botao = ({
+  title,
+  onPress,
+  style,
+  styleTexto,
   variante = 'primario',
-  disabled = false 
+  disabled = false,
+  icon = null,
+  actveOpacity = 0.7,
 }) => {
   const obterEstiloBotao = () => {
     switch (variante) {
@@ -36,14 +37,16 @@ const Botao = ({
         styles.botaoBase,
         obterEstiloBotao(),
         disabled && styles.botaoDesabilitado,
-        style
+        style,
       ]}
       onPress={onPress}
       disabled={disabled}
+      activeOpacity={actveOpacity}
     >
-      <Text style={[obterEstiloTexto(), styleTexto]}>
-        {title}
-      </Text>
+      <View style={styles.conteudoBotao}>
+        {icon && <View style={styles.icone}>{icon}</View>}
+        <Text style={[obterEstiloTexto(), styleTexto]}>{title}</Text>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -56,7 +59,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   botaoPrimario: {
-    backgroundColor:'#f5a522',
+    backgroundColor: '#f5a522',
   },
   botaoSecundario: {
     backgroundColor: '#283579',
@@ -72,12 +75,18 @@ const styles = StyleSheet.create({
   textoBotao: {
     color: '#FFF',
     fontSize: 16,
-
   },
   textoOutline: {
     color: '#f5a522',
     fontSize: 16,
-
+  },
+  conteudoBotao: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icone: {
+    marginRight: 8,
   },
 });
 

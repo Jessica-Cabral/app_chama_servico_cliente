@@ -24,10 +24,10 @@ const CadastroCliente = ({ navigation }) => {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-
   const [confirmar_senha, setConfirmar_senha] = useState("");
 
   const manipularCadastro = async () => {
+    console.log("Botão pressionado");
     //valida se todos os campos obrigatórios foram preenchidos
     if (!nome || !email || !senha || !confirmar_senha) {
       Alert.alert("Erro", "Preencha todos os campos obrigatórios.");
@@ -43,7 +43,7 @@ const CadastroCliente = ({ navigation }) => {
 
     if (resultado.sucesso) {
       Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
-      navigation.replace("PerfilCliente");
+      navigation.replace("Login");
     } else {
       Alert.alert("Erro", resultado.erro || "Erro ao cadastrar.");
     }
@@ -109,7 +109,6 @@ const CadastroCliente = ({ navigation }) => {
               <Botao
                 title="Cadastrar"
                 onPress={manipularCadastro}
-                //onPress={cadastrarCliente}
                 style={styles.botaoLogin}
                 styleTexto={styles.textoBotao}
               />

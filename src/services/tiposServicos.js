@@ -1,10 +1,10 @@
 //API para listagem do tipo de serviço
-const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php';
+const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/tipos-servico';
 
 //const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/tipos_servicos.php';
 //const { token } = useContext(AuthContext);
 
-export async function listarTiposServicos() {
+export async function listarTiposServicos(token) {
   try {
     const response = await fetch(API_URL, {
       method: 'GET',

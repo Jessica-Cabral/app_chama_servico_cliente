@@ -1,5 +1,5 @@
 // Api para gerenciamento das solicitações de serviço
-const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php';
+const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/solicitacoes';
 
 //const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/solicitacoes.php';
 //const UPLOAD_URL = 'https://chamaservico.tds104-senac.online/api/cliente/upload_imagem_solicitacao.php';
@@ -23,31 +23,19 @@ export async function listarSolicitacoes(cliente_id, filtros = {}) {
   }
 }
 
-export async function criarSolicitacao({
-  cliente_id,
-  tipo_servico_id,
-  endereco_id,
-  titulo,
-  descricao,
-  orcamento_estimado,
-  data_atendimento,
-  urgencia = 'normal'
-}) {
+export async function criarSolicitacao(
+  dados,
+  token
+) {
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
-        cliente_id,
-        tipo_servico_id,
-        endereco_id,
-        titulo,
-        descricao,
-        orcamento_estimado,
-        data_atendimento,
-        urgencia
+        dados
       })
     });
 
@@ -80,5 +68,22 @@ export async function enviarImagemSolicitacao(solicitacao_id, imagemUri) {
     return data;
   } catch (error) {
     return { erro: 'Erro ao enviar imagem' };
+  }
+}
+
+export async function atualizarSolicitacao(solicitacao_id, dadosAtualizados) {
+  try {
+    const response = await fetch(`${API_URL}/solicitacoes/${solicitacao_id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dadosAtualizados),
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return { erro: 'Erro ao atualizar solicitação' };
   }
 }

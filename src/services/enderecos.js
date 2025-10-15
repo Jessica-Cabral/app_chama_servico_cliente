@@ -1,27 +1,31 @@
 // API para gerenciamento de endereço
 
 //const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/enderecos.php';
-const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php';
+const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/perfil';
 
 //const { token } = useContext(AuthContext);
 
-export async function listarEnderecos(cliente_id) {
+export async function listarEnderecos(cliente_id, token) {
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${API_URL}?cliente_id=${cliente_id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ cliente_id })
     });
 
     const data = await response.json();
-    return data;
-  } catch (error) {
-    return { erro: 'Erro ao buscar endereços' };
-  }
+    if (data.sucesso && Array.isArray(data.enderecos)) {
+        return { sucesso: true, enderecos: data.enderecos };
+      } else {
+        return { erro: data.erro || 'Endereços não encontrados' };
+      }
+    } catch (error) {
+      return { erro: 'Erro ao buscar endereços' };
+    }
 }
+
 
 export async function cadastrarEndereco(cliente_id, cep, numero, complemento, principal = false) {
   try {

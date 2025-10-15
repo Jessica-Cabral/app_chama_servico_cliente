@@ -1,5 +1,5 @@
 // src/context/AuthContext.js
-import React, { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const AuthContext = createContext();
@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
     const carregarDados = async () => {
       try {
         const dadosSalvos = await AsyncStorage.getItem('usuario');
+        const tokenSalvo = await AsyncStorage.getItem('token');
         if (dadosSalvos) {
           try {
             const usuarioParse = JSON.parse(dadosSalvos);
@@ -23,9 +24,14 @@ export const AuthProvider = ({ children }) => {
           }
         }
         
+        if (tokenSalvo) {
+          //usa token salvo
+          setToken(tokenSalvo); 
+        }
+        
         // Token fixo
-        const tokenFixo = '781e5e245d69b566979b86e28d23f2c7';
-        setToken(tokenFixo);
+        const token = '781e5e245d69b566979b86e28d23f2c7';
+        setToken(token);
 
 
       } catch (error) {
@@ -43,6 +49,12 @@ export const AuthProvider = ({ children }) => {
     try {
       await AsyncStorage.setItem('usuario', JSON.stringify(dadosUsuario));
       setUsuario(dadosUsuario);
+
+      if (dadosUsuario.token) {
+        //salva o token retornado pelo API
+        setToken(dadosUsuario.token);
+        await AsyncStorage.setItem('token', dadosUsuario.token)
+      }
     } catch (error) {
       console.error('Erro ao salvar dados do usuário:', error);
     }

@@ -1,4 +1,6 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { autenticarCliente } from "../services/auth";
 import {
   View,
   Text,
@@ -12,14 +14,14 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import Botao from "../components/Botao";
 import InputCampo from "../components/InputCampo";
-import axios from "axios";
-import { AuthContext } from "../context/AuthContext";
 
 
 const Login = ({ navigation }) => {
+  //acessa o login do contexto
+  const {login} = useContext(AuthContext)
+  // parâmentros 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const { login } = useContext(AuthContext);
 
   const manipularLogin = async () => {
     if (!email || !senha) {
@@ -27,23 +29,33 @@ const Login = ({ navigation }) => {
       return;
     }
 
-    try {
-      const response = await axios.post("hhttps://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/login", {
-        email,
-        senha,
-      });
+    const resultado = await autenticarCliente(email, senha);
 
-      if (response.data.sucesso) {
-        await login({ token: response.data.token, usuario: response.data.usuario }); // salva token JWT e dados do usuário
-        navigation.replace("MainTabs"); // redireciona para as abas
-      } else {
-        Alert.alert("Erro", response.data.erro || "Credenciais inválidas");
-      }
-    } catch (error) {
-      console.error("Erro na autenticação:", error);
-      Alert.alert("Erro", "Não foi possível conectar ao servidor");
+    if (resultado.sucesso) {
+      // salva  no contexto e inclui token
+      await login ({ ...resultado.usuario, token: resultado.token}); 
+      navigation.replace("DashboardCliente");
+    } else {
+      Alert.alert("Erro", resultado.erro || "Erro ao realizar login.");
     }
-  };
+      
+  //   try {
+  //     const response = await axios.post("hhttps://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/login", {
+  //       email,
+  //       senha,
+  //     });
+
+  //     if (response.data.sucesso) {
+  //       await login({ token: response.data.token, usuario: response.data.usuario }); // salva token JWT e dados do usuário
+  //       navigation.replace("MainTabs"); // redireciona para as abas
+  //     } else {
+  //       Alert.alert("Erro", response.data.erro || "Credenciais inválidas");
+  //     }
+  //   } catch (error) {
+  //     console.error("Erro na autenticação:", error);
+  //     Alert.alert("Erro", "Não foi possível conectar ao servidor");
+  //   }
+   };
 
   return (
     <LinearGradient colors={["#0a112e", "#283579"]} style={styles.container}>
@@ -84,7 +96,7 @@ const Login = ({ navigation }) => {
               />
 
               <TouchableOpacity style={styles.linkEsqueceuSenha} 
-                onPress={() => navigation.navigate("NovaSolicitacao")}>
+                onPress={() => navigation.navigate("")}>
                 <Text style={styles.textoEsqueceuSenha}>Esqueceu sua senha?</Text>
               </TouchableOpacity>
 

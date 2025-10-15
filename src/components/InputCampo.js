@@ -1,42 +1,56 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 
-export default function InputCampo({ label, value, onChangeText, placeholder, editable = true, secureTextEntry = false }) {
+const InputCampo = ({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  keyboardType = 'default',
+  editable = true,
+  erro,
+}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
-        style={[styles.input, !editable && styles.disabled]}
+        style={[styles.input, erro && styles.inputErro]}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
+        keyboardType={keyboardType}
         editable={editable}
-        secureTextEntry={secureTextEntry}
-        //icons ={icone}
+        placeholderTextColor="#aaa"
       />
+      {erro && <Text style={styles.textoErro}>{erro}</Text>}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
   },
   label: {
-    fontSize: 14,
-    color: '#0a112e',
+    color: '#fff',
     marginBottom: 4,
+    fontWeight: 'bold',
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#4e5264',
-    borderRadius: 8,
-    padding: 8,
-    fontSize: 14,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 6,
+    fontSize: 16,
   },
-  disabled: {
-    backgroundColor: '#f5f5f5',
-    color: '#4e5264',
+  inputErro: {
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+  textoErro: {
+    color: 'red',
+    marginTop: 4,
+    fontSize: 12,
   },
 });
+
+export default InputCampo;

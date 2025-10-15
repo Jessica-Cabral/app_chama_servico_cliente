@@ -12,26 +12,45 @@ import MinhasSolicitacoes from './src/screens/MinhasSolicitacoes';
 import NovaSolicitacao from './src/screens/NovaSolicitacao';
 import PerfilCliente from './src/screens/PerfilCliente';
 import PropostasRecebidas from './src/screens/PropostasRecebidas';
+const { MaterialIcons } = require('@expo/vector-icons');
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 // Stack para a aba "Serviços"
-function ServicosStack() {
+function DashStack() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="DashboardCliente" component={DashboardCliente} />
-      {/* <Stack.Screen name="NovaSolicitacao" component={NovaSolicitacao} /> */}
-      <Stack.Screen name="PropostasRecebidas" component={PropostasRecebidas} />
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#1976D2' }, // cor de fundo do header
+        headerTintColor: '#fff', // cor do texto/título
+        headerTitleAlign: 'center', // centraliza o título
+      }}
+    >
+      <Stack.Screen
+        name="DashboardCliente"
+        component={DashboardCliente}
+        options={{ title: 'Dashboard Cliente' }}
+      />
+      <Stack.Screen
+        name="PropostasRecebidas"
+        component={PropostasRecebidas}
+        options={{ title: 'Propostas Recebidas' }}
+      />
+      <Stack.Screen
+        name="NovaSolicitacao"
+        component={NovaSolicitacao}
+        options={{ title: 'Nova Solicitacao' }}
+      />
     </Stack.Navigator>
   );
 }
 
 // Stack para a aba "Perfil"
-function PerfilStack() {
+function NovoServicoStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="PerfilCliente" component={PerfilCliente} />
+      <Stack.Screen name="NovaSolicitacao" component={NovaSolicitacao} />
       <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
     </Stack.Navigator>
   );
@@ -45,6 +64,7 @@ function AuthRoutes() {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
       <Stack.Screen name="NovaSolicitacao" component={NovaSolicitacao} />
+      <Stack.Screen name="DashboardCliente" component={DashboardCliente} />
     </Stack.Navigator>
   );
 }
@@ -53,10 +73,31 @@ function AuthRoutes() {
 // Rotas principais com abas
 function MainRoutes() {
   return (
-    <Tab.Navigator initialRouteName="Serviços">
-      <Tab.Screen name="Serviços" component={ServicosStack} options={{ headerShown: false }} />
+    <Tab.Navigator
+      initialRouteName="Dashboard"
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
+          let iconName;
+
+          if (route.name === 'Dashboard') {
+            iconName = 'home';
+          } else if (route.name === 'Minhas Solicitações') {
+            iconName = 'list-alt';
+          } else if (route.name === 'Nova Solicitação') {
+            iconName = 'add-circle-outline';
+          }
+
+          // Usando MaterialIcons do @expo/vector-icons
+          // Certifique-se de instalar: expo install @expo/vector-icons
+          return <MaterialIcons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#1976D2',
+        tabBarInactiveTintColor: 'gray',
+      })}
+    >
+      <Tab.Screen name="Dashboard" component={DashStack} options={{ headerShown: false }} />
       <Tab.Screen name="Minhas Solicitações" component={MinhasSolicitacoes} />
-      <Tab.Screen name="Perfil" component={PerfilStack} options={{ headerShown: false }} />
+      <Tab.Screen name="Nova Solicitação" component={NovoServicoStack} options={{ headerShown: false }} />
     </Tab.Navigator>
   );
 }
