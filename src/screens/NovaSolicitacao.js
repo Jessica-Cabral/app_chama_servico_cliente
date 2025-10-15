@@ -44,7 +44,7 @@ export default function NovaSolicitacao1({ route, navigation }) {
   const [descricao, setDescricao] = useState(solicitacao?.descricao ?? '');
   const [orcamento, setOrcamento] = useState(solicitacao?.orcamento_estimado ?? '');
   const [dataAtendimento, setDataAtendimento] = useState(solicitacao?.data_atendimento ?? '');
-  const [urgencia, setUrgencia] = useState(solicitacao?.urgencia ?? 'normal');
+  const [urgencia, setUrgencia] = useState(solicitacao?.urgencia ?? 'baixa');
   const [imagens, setImagens] = useState([]);
   const [resumo, setResumo] = useState(null);
   const [erros, setErros] = useState({});
@@ -150,7 +150,7 @@ export default function NovaSolicitacao1({ route, navigation }) {
       setDescricao('');
       setOrcamento('');
       setDataAtendimento('');
-      setUrgencia('normal');
+      setUrgencia('baixa');
       setImagens([]);
       setResumo(null);
     } else {
@@ -227,7 +227,7 @@ export default function NovaSolicitacao1({ route, navigation }) {
           />
           <RadioGrupo
             label="Urgência"
-            options={["normal", "media", "urgente"]}
+            options={["baixa", "media", "alta"]}
             selected={urgencia}
             onSelect={setUrgencia}
           />

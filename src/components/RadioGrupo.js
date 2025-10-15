@@ -4,19 +4,19 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
 const cores = {
-  normal: '#4CAF50',
+  baixa: '#4CAF50',
   media: '#FFC107',
-  urgente: '#F44336',
+  alta: '#F44336',
 };
 
 const icones = {
-  normal: 'smile-o',
+  baixa: 'check-circle-o', // Ícone mais aderente para baixa urgência
   media: 'exclamation-circle',
-  urgente: 'exclamation-triangle',
+  alta: 'exclamation-triangle',
 };
 
 export default function RadioGrupoUrgencia({ selected, onSelect }) {
-  const options = ['normal', 'media', 'urgente'];
+  const options = ['baixa', 'media', 'alta'];
 
   return (
     <View style={styles.container}>
