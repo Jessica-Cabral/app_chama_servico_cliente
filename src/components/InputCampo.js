@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const aplicarMascaraDataHora = (text) => {
   const cleaned = text.replace(/\D/g, '');
@@ -25,7 +26,10 @@ const InputCampo = ({
   erro,
   tipo = 'text',
   maxLength,
+  secureTextEntry = false,
 }) => {
+  const [mostrarSenha, setMostrarSenha] = React.useState(false);
+
   const handleChange = (text) => {
     if (tipo === 'datetime') {
       const formatado = aplicarMascaraDataHora(text);
@@ -35,19 +39,33 @@ const InputCampo = ({
     }
   };
 
+  const isPassword = tipo === 'password' || secureTextEntry;
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <TextInput
-        style={[styles.input, erro && styles.inputErro]}
-        value={value}
-        onChangeText={handleChange}
-        placeholder={placeholder}
-        keyboardType={keyboardType}
-        editable={editable}
-        placeholderTextColor="#aaa"
-        maxLength={maxLength}
-      />
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <TextInput
+          style={[styles.input, erro && styles.inputErro, { flex: 1 }]}
+          value={value}
+          onChangeText={handleChange}
+          placeholder={placeholder}
+          keyboardType={keyboardType}
+          editable={editable}
+          placeholderTextColor="#aaa"
+          maxLength={maxLength}
+          secureTextEntry={isPassword && !mostrarSenha}
+        />
+        {isPassword && (
+          <Ionicons
+            name={mostrarSenha ? 'eye-off' : 'eye'}
+            size={24}
+            color="#283579"
+            style={{ marginLeft: 8 }}
+            onPress={() => setMostrarSenha(!mostrarSenha)}
+          />
+        )}
+      </View>
       {erro && <Text style={styles.textoErro}>{erro}</Text>}
     </View>
   );
@@ -58,15 +76,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    color: '#fff',
+    color: '#283579',
     marginBottom: 4,
     fontWeight: 'bold',
   },
   input: {
-    backgroundColor: '#fff',
     padding: 10,
-    borderRadius: 6,
-    fontSize: 16,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    color: "#0a112e",
   },
   inputErro: {
     borderColor: 'red',

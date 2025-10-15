@@ -13,7 +13,7 @@ export default function SecaoFormulario({ titulo, children }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#283579',
+    backgroundColor: '#FFF',
     padding: 16,
     borderRadius: 12,
     marginBottom: 20,
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   titulo: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#f5a522',
+    color: '#2D3748',
     marginBottom: 12,
   },
 });

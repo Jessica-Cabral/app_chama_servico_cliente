@@ -9,7 +9,7 @@ const Botao = ({
   variante = 'primario',
   disabled = false,
   icon = null,
-  actveOpacity = 0.7,
+  activeOpacity = 0.7,
 }) => {
   const obterEstiloBotao = () => {
     switch (variante) {
@@ -41,7 +41,7 @@ const Botao = ({
       ]}
       onPress={onPress}
       disabled={disabled}
-      activeOpacity={actveOpacity}
+      activeOpacity={activeOpacity}
     >
       <View style={styles.conteudoBotao}>
         {icon && <View style={styles.icone}>{icon}</View>}

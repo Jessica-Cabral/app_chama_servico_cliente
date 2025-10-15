@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, Image, ScrollView, Alert } from 'react-native';
-//import * as ImagePicker from 'expo-image-picker';
+import React, { useEffect, useState, useContext } from 'react';
+import { View, ScrollView, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { AuthContext } from '../context/AuthContext';
 import clienteApi from '../services/clienteApi';
 import EnderecoCard from '../components/EnderecoCard';
 import FotoPerfilUploader from '../components/FotoPerfilUploader';
+import InputCampo from '../components/InputCampo';
+import Botao from '../components/Botao';
 
 export default function PerfilCliente() {
+  const { usuario, token } = useContext(AuthContext);
   const [perfil, setPerfil] = useState({});
   const [enderecos, setEnderecos] = useState([]);
   const [editando, setEditando] = useState(false);
@@ -14,63 +18,154 @@ export default function PerfilCliente() {
 
   useEffect(() => {
     async function carregarPerfil() {
-      const clienteId = 1; // Exemplo
-      const response = await clienteApi.buscarPerfil(clienteId);
+      if (!usuario?.id) return;
+      const response = await clienteApi.buscarPerfil(usuario.id);
       if (response.sucesso) {
         setPerfil(response.perfil);
         setEnderecos(response.enderecos);
       }
     }
     carregarPerfil();
-  }, []);
+  }, [usuario]);
 
   const handleSalvar = async () => {
     if (novaSenha && novaSenha !== confirmarSenha) {
-      Alert.alert('Erro', 'As senhas não coincidem');
+      alert('As senhas não coincidem');
       return;
     }
 
-    // Chamada para atualizar perfil (a ser implementada na API)
-    Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
-    setEditando(false);
+    try {
+      const response = await clienteApi.atualizarPerfil(
+        usuario.id,
+        perfil.nome,
+        perfil.email,
+        perfil.telefone,
+        perfil.cpf,
+        perfil.dt_nascimento,
+        token
+      );
+
+      if (response.sucesso) {
+        alert('Perfil atualizado com sucesso!');
+        setEditando(false);
+      } else {
+        alert(response.erro || 'Erro ao atualizar perfil');
+      }
+    } catch (error) {
+      alert('Erro inesperado ao atualizar perfil');
+      console.error(error);
+    }
   };
 
   return (
-    <ScrollView style={{ padding: 16 }}>
-      <FotoPerfilUploader fotoAtual={perfil.foto_perfil} />
-      
-      <Text>Nome completo *</Text>
-      <TextInput value={perfil.nome} editable={editando} onChangeText={(text) => setPerfil({ ...perfil, nome: text })} />
+    <LinearGradient colors={['#0a112e', '#283579']} style={styles.container}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <View style={styles.card}>
+          <FotoPerfilUploader fotoAtual={perfil.foto_perfil} />
 
-      <Text>Email *</Text>
-      <TextInput value={perfil.email} editable={editando} onChangeText={(text) => setPerfil({ ...perfil, email: text })} />
+          <InputCampo
+            label="Nome completo *"
+            value={perfil.nome}
+            editable={editando}
+            onChangeText={(text) => setPerfil({ ...perfil, nome: text })}
+            placeholder="Digite seu nome"
+          />
 
-      <Text>Telefone *</Text>
-      <TextInput value={perfil.telefone} editable={editando} onChangeText={(text) => setPerfil({ ...perfil, telefone: text })} />
+          <InputCampo
+            label="Email *"
+            value={perfil.email}
+            editable={editando}
+            onChangeText={(text) => setPerfil({ ...perfil, email: text })}
+            placeholder="Digite seu email"
+            keyboardType="email-address"
+          />
 
-      <Text>CPF (não editável)</Text>
-      <TextInput value={perfil.cpf} editable={false} />
+          <InputCampo
+            label="Telefone *"
+            value={perfil.telefone}
+            editable={editando}
+            onChangeText={(text) => setPerfil({ ...perfil, telefone: text })}
+            placeholder="Digite seu telefone"
+            keyboardType="phone-pad"
+          />
 
-      <Text>Data de nascimento (não editável)</Text>
-      <TextInput value={perfil.dt_nascimento} editable={false} />
+          <InputCampo
+            label="CPF"
+            value={perfil.cpf}
+            editable={false}
+          />
 
-      {editando && (
-        <>
-          <Text>Nova senha</Text>
-          <TextInput secureTextEntry value={novaSenha} onChangeText={setNovaSenha} />
+          <InputCampo
+            label="Data de nascimento"
+            value={perfil.dt_nascimento}
+            editable={false}
+            tipo="datetime"
+          />
 
-          <Text>Confirmar nova senha</Text>
-          <TextInput secureTextEntry value={confirmarSenha} onChangeText={setConfirmarSenha} />
-        </>
-      )}
+          {editando && (
+            <>
+              <InputCampo
+                label="Nova senha"
+                value={novaSenha}
+                onChangeText={setNovaSenha}
+                placeholder="Digite a nova senha"
+                secureTextEntry
+              />
+              <InputCampo
+                label="Confirmar nova senha"
+                value={confirmarSenha}
+                onChangeText={setConfirmarSenha}
+                placeholder="Confirme a nova senha"
+                secureTextEntry
+              />
+            </>
+          )}
 
-      <Button title={editando ? 'Salvar alterações' : 'Editar perfil'} onPress={() => editando ? handleSalvar() : setEditando(true)} />
-      {editando && <Button title="Cancelar" onPress={() => setEditando(false)} color="#EF4444" />}
+          <Botao
+            title={editando ? 'Salvar alterações' : 'Editar perfil'}
+            onPress={() => (editando ? handleSalvar() : setEditando(true))}
+            variante="primario"
+          />
 
-      <Text style={{ marginTop: 24, fontSize: 18 }}>Endereços</Text>
-      {enderecos.map((endereco) => (
-        <EnderecoCard key={endereco.id} endereco={endereco} />
-      ))}
-    </ScrollView>
+          {editando && (
+            <Botao
+              title="Cancelar"
+              onPress={() => setEditando(false)}
+              variante="secundario"
+            />
+          )}
+        </View>
+
+        <View style={styles.enderecos}>
+          <InputCampo label="Endereços" value="" editable={false} />
+          {enderecos.map((endereco) => (
+            <EnderecoCard key={endereco.id} endereco={endereco} />
+          ))}
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    padding: 16,
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    shadowColor: '#4e5264',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  enderecos: {
+    marginTop: 24,
+  },
+});

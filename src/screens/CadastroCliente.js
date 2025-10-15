@@ -16,10 +16,9 @@ import { Ionicons } from "@expo/vector-icons";
 import Botao from "../components/Botao";
 import InputCampo from "../components/InputCampo";
 
-
 const CadastroCliente = ({ navigation }) => {
   //acessar token
-  const {token} = useContext(AuthContext)
+  const { token } = useContext(AuthContext);
   //parâmentos utilizados
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -38,8 +37,14 @@ const CadastroCliente = ({ navigation }) => {
       Alert.alert("Erro", "As senhas não coincidem. Digite a senha novamente.");
       return;
     }
-    
-    const resultado = await cadastrarCliente(nome, email, senha, novaSenha, token);
+
+    const resultado = await cadastrarCliente(
+      nome,
+      email,
+      senha,
+      confirmar_senha,
+      token
+    );
 
     if (resultado.sucesso) {
       Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
@@ -47,8 +52,6 @@ const CadastroCliente = ({ navigation }) => {
     } else {
       Alert.alert("Erro", resultado.erro || "Erro ao cadastrar.");
     }
-  
-
   };
 
   return (
@@ -74,7 +77,9 @@ const CadastroCliente = ({ navigation }) => {
                 value={nome}
                 onChangeText={setNome}
                 placeholder="Digite seu nome completo"
-                icone={<Ionicons name="person-outline" size={20} color="#283579" />}
+                icone={
+                  <Ionicons name="person-outline" size={20} color="#283579" />
+                }
               />
               <Text>Informe seu nome como aparece em documentos.</Text>
 
@@ -84,7 +89,9 @@ const CadastroCliente = ({ navigation }) => {
                 onChangeText={setEmail}
                 placeholder="Digite seu e-mail"
                 secureTextEntry={false}
-                icone={<Ionicons name="mail-outline" size={20} color="#283579" />}
+                icone={
+                  <Ionicons name="mail-outline" size={20} color="#283579" />
+                }
               />
 
               <InputCampo
@@ -94,7 +101,13 @@ const CadastroCliente = ({ navigation }) => {
                 placeholder="Crie uma senha"
                 secureTextEntry={true}
                 obrigatorio
-                icone={<Ionicons name="lock-closed-outline" size={20} color="#283579" />}
+                icone={
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color="#283579"
+                  />
+                }
               />
 
               <InputCampo
@@ -103,7 +116,13 @@ const CadastroCliente = ({ navigation }) => {
                 onChangeText={setConfirmar_senha}
                 placeholder="Confirme a senha"
                 secureTextEntry={true}
-                icone={<Ionicons name="lock-closed-outline" size={20} color="#283579" />}
+                icone={
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color="#283579"
+                  />
+                }
               />
 
               <Botao
@@ -128,17 +147,42 @@ const CadastroCliente = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  // reutiliza os mesmos estilos da tela de login
   container: { flex: 1 },
   keyboardContainer: { flex: 1 },
   scrollContainer: { flexGrow: 1 },
-  cabecalho: { alignItems: "center", justifyContent: "center", padding: 24, paddingTop: 50 },
+  cabecalho: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+    paddingTop: 50,
+  },
   logoLinha: { flexDirection: "row", alignItems: "center", gap: 8 },
   textoLogo: { fontSize: 32, color: "#FFF", fontWeight: "bold" },
-  textoLogoServico: { fontSize: 32, color: "#f5a522", fontWeight: "bold", marginLeft: 8 },
-  containerFormulario: { flex: 1, justifyContent: "center", paddingHorizontal: 24 },
-  titulo: { fontSize: 24, color: "#0a112e", fontWeight: 'bold', textAlign: "center", marginBottom: 8 },
-  subtitulo: { fontSize: 16, color: '#4e5264', textAlign: "center", opacity: 0.9, marginBottom: 32 },
+  textoLogoServico: {
+    fontSize: 32,
+    color: "#f5a522",
+    fontWeight: "bold",
+    marginLeft: 8,
+  },
+  containerFormulario: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 24,
+  },
+  titulo: {
+    fontSize: 24,
+    color: "#0a112e",
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  subtitulo: {
+    fontSize: 16,
+    color: "#4e5264",
+    textAlign: "center",
+    opacity: 0.9,
+    marginBottom: 32,
+  },
   formulario: {
     backgroundColor: "#FFF",
     borderRadius: 12,
@@ -150,7 +194,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   botaoLogin: { marginBottom: 24 },
-  containerCadastro: { flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 4 },
+  containerCadastro: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 4,
+  },
   textoCadastro: { color: "#4e5264", fontSize: 14 },
   linkCadastro: { color: "#f5a522", fontSize: 14 },
 });

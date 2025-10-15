@@ -65,9 +65,11 @@ export async function enviarImagemSolicitacao(solicitacao_id, imagemUri) {
       body: formData
     });
 
-    const data = await response.json();
-    return data;
+    const resultado = await response.json();
+    console.log('Resultado do envio da imagem:', resultado);
+    return resultado;
   } catch (error) {
+    console.error('Erro ao enviar imagem:', error);
     return { erro: 'Erro ao enviar imagem' };
   }
 }

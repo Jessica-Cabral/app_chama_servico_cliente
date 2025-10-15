@@ -34,13 +34,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    color: '#fff',
+    color: '#283579',
     marginBottom: 4,
     fontWeight: 'bold',
   },
   pickerContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f0f0f0',
     borderRadius: 6,
+    color: "#0a112e",
   },
   picker: {
     height: 50,

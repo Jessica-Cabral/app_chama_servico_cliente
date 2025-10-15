@@ -42,6 +42,11 @@ function DashStack() {
         component={NovaSolicitacao}
         options={{ title: 'Nova Solicitacao' }}
       />
+      <Stack.Screen
+        name="PerfilCliente"
+        component={PerfilCliente}
+        options={{ title: 'PerfilCliente' }}
+      />
     </Stack.Navigator>
   );
 }
