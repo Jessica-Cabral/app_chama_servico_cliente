@@ -164,7 +164,7 @@ export default function NovaSolicitacao1({ route, navigation }) {
   };
 
   return (
-  <LinearGradient colors={["#283579","#0a112e"]} style={styles.container}>
+    <LinearGradient colors={["#283579", "#0a112e"]} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <Text style={styles.titulo}>
           {solicitacao ? "Editar Solicitação" : "Nova Solicitação"}
@@ -203,7 +203,7 @@ export default function NovaSolicitacao1({ route, navigation }) {
           />
         </SecaoFormulario>
 
-        <SecaoFormulario titulo="Endereço">
+        <SecaoFormulario titulo="Endereço do serviço">
           <SelectCampo
             label="Endereço"
             selectedValue={enderecoId}
@@ -213,6 +213,11 @@ export default function NovaSolicitacao1({ route, navigation }) {
             }}
             options={enderecos}
             erro={erros.enderecoId}
+          />
+          <Botao
+            title="Adicionar Novo Endereço"
+            variante="outline"
+            onPress={() => navigation.navigate("PerfilCliente", { abrirModalEndereco: true })}
           />
         </SecaoFormulario>
 
@@ -271,7 +276,7 @@ export default function NovaSolicitacao1({ route, navigation }) {
           variante="primario"
         />
       </ScrollView>
-  </LinearGradient>
+    </LinearGradient>
   );
 }
 

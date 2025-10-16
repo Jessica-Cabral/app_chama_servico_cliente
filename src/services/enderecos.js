@@ -2,6 +2,7 @@
 
 //const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/enderecos.php';
 const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/perfil';
+const ENDERECO_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/enderecos';
 
 //const { token } = useContext(AuthContext);
 
@@ -29,7 +30,7 @@ export async function listarEnderecos(cliente_id, token) {
 
 export async function cadastrarEndereco(cliente_id, cep, numero, complemento, principal = false) {
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(ENDERECO_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -46,8 +47,8 @@ export async function cadastrarEndereco(cliente_id, cep, numero, complemento, pr
 
 export async function definirEnderecoPrincipal(cliente_id, endereco_id, token) {
   try {
-    const response = await fetch(API_URL, {
-      method: 'POST',
+    const response = await fetch(ENDERECO_URL, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -64,7 +65,7 @@ export async function definirEnderecoPrincipal(cliente_id, endereco_id, token) {
 
 export async function excluirEndereco(cliente_id, endereco_id, token) {
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(ENDERECO_URL, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

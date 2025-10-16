@@ -38,23 +38,6 @@ const Login = ({ navigation }) => {
     } else {
       Alert.alert("Erro", resultado.erro || "Erro ao realizar login.");
     }
-      
-  //   try {
-  //     const response = await axios.post("hhttps://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/login", {
-  //       email,
-  //       senha,
-  //     });
-
-  //     if (response.data.sucesso) {
-  //       await login({ token: response.data.token, usuario: response.data.usuario }); // salva token JWT e dados do usuário
-  //       navigation.replace("MainTabs"); // redireciona para as abas
-  //     } else {
-  //       Alert.alert("Erro", response.data.erro || "Credenciais inválidas");
-  //     }
-  //   } catch (error) {
-  //     console.error("Erro na autenticação:", error);
-  //     Alert.alert("Erro", "Não foi possível conectar ao servidor");
-  //   }
    };
 
   return (

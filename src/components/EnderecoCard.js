@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import Botao from './Botao';
 
@@ -16,14 +15,17 @@ export default function EnderecoCard({ endereco, onDefinirPrincipal, onExcluir }
 
   return (
     <View style={styles.card}>
+      {endereco.principal === 1 && (
+        <View style={styles.principalTag}>
+          <Text style={styles.principalTexto}>★ Endereço Principal</Text>
+        </View>
+      )}
+
       <Text style={styles.texto}>{endereco.logradouro}, {endereco.numero}</Text>
       <Text style={styles.texto}>{endereco.bairro}</Text>
+      <Text style={styles.texto}>{endereco.complemento}</Text>
       <Text style={styles.texto}>{endereco.cidade}/{endereco.estado}</Text>
       <Text style={styles.texto}>CEP: {endereco.cep}</Text>
-
-      {endereco.principal === 1 && (
-        <Text style={styles.flagPrincipal}>Endereço Principal</Text>
-      )}
 
       <View style={styles.botoes}>
         {endereco.principal !== 1 && (
@@ -36,44 +38,47 @@ export default function EnderecoCard({ endereco, onDefinirPrincipal, onExcluir }
         <Botao
           title="Excluir"
           variante="secundario"
-          onPress={confirmarExclusao}
+          onPress={() => confirmarExclusao(endereco.id)}
         />
       </View>
     </View>
   );
 }
 
+
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#f5f5f5',
-    padding: 16,
-    borderRadius: 10,
-    marginBottom: 12,
-    shadowColor: '#4e5264',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
-  },
-  texto: {
-    color: '#0a112e',
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  flagPrincipal: {
-    backgroundColor: '#f5a522',
-    color: '#ffffff',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-    marginTop: 8,
-    fontWeight: 'bold',
-  },
-  botoes: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
-    gap: 8,
-  },
+  backgroundColor: '#e0e0e0',
+  padding: 16,
+  borderRadius: 10,
+  marginBottom: 12,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+},
+principalTag: {
+  backgroundColor: '#f5a522',
+  paddingVertical: 4,
+  paddingHorizontal: 8,
+  borderRadius: 6,
+  alignSelf: 'flex-start',
+  marginBottom: 8,
+},
+principalTexto: {
+  color: '#ffffff',
+  fontWeight: 'bold',
+},
+texto: {
+  color: '#0a112e',
+  fontSize: 14,
+  marginBottom: 4,
+},
+botoes: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginTop: 12,
+  gap: 8,
+},
 });

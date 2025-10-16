@@ -57,6 +57,7 @@ function NovoServicoStack() {
     <Stack.Navigator>
       <Stack.Screen name="NovaSolicitacao" component={NovaSolicitacao} />
       <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
+      <Stack.Screen name="PerfilCliente" component={PerfilCliente} />
     </Stack.Navigator>
   );
 }

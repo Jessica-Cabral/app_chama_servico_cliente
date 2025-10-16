@@ -8,7 +8,7 @@ const Botao = ({
   styleTexto,
   variante = 'primario',
   disabled = false,
-  icon = null,
+  icone = null,
   activeOpacity = 0.7,
 }) => {
   const obterEstiloBotao = () => {
@@ -46,8 +46,8 @@ const Botao = ({
       activeOpacity={activeOpacity}
     >
       <View style={styles.conteudoBotao}>
-        {icon && <View style={styles.icone}>{icon}</View>}
-        <Text style={[obterEstiloTexto(), styleTexto]}>{title}</Text>
+        {icone && <View style={styles.icone}>{icone}</View>}
+        {title !== '' && <Text style={[obterEstiloTexto(), styleTexto]}>{title}</Text>}
       </View>
     </TouchableOpacity>
   );

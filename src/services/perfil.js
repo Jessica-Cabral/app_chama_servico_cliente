@@ -41,23 +41,23 @@ export async function atualizarPerfil(cliente_id, nome, email, telefone, cpf, dt
 }
 
 
-export async function definirEnderecoPrincipal(cliente_id, endereco_id, token) {
-  try {
-    const response = await fetch(ENDERECO_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        cliente_id,
-        endereco_id,
-        principal: 1
-      })
-    });
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    return { erro: 'Erro ao definir endereço principal' };
-  }
-}
+// export async function definirEnderecoPrincipal(cliente_id, endereco_id, token) {
+//   try {
+//     const response = await fetch(ENDERECO_URL, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${token}`
+//       },
+//       body: JSON.stringify({
+//         cliente_id,
+//         endereco_id,
+//         principal: 1
+//       })
+//     });
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     return { erro: 'Erro ao definir endereço principal' };
+//   }
+// }
