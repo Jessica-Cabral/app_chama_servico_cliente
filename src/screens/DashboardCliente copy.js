@@ -260,7 +260,7 @@ const DashboardCliente = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fFFF", padding: 16 },
+  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
   cabecalho: {
     tituloCabecalho: {
       fontSize: 22,

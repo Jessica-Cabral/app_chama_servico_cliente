@@ -192,38 +192,6 @@ const MinhasSolicitacoes = () => {
             </TouchableOpacity>
           ))}
         </View>
-
-        {/* Filtros de urgência
-        <Text style={styles.subtitulo}>Urgência:</Text>
-        <View style={styles.filtrosContainer}>
-          {urgenciaOpcoes.map((nivel) => (
-            <TouchableOpacity
-              key={nivel}
-              onPress={() => setFiltroUrgencia(nivel)}
-              style={[
-                styles.filtroBotao,
-                filtroUrgencia === nivel && styles.filtroBotaoAtivo,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.filtroTexto,
-                  filtroUrgencia === nivel && styles.filtroTextoAtivo,
-                ]}
-              >
-                {nivel.charAt(0).toUpperCase() + nivel.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Botão Filtrar */}
-        {/* <TouchableOpacity
-          onPress={() => {}}
-          style={styles.botaoFiltrar}
-        >
-          <Text style={styles.botaoFiltrarTexto}>Filtrar</Text>
-        </TouchableOpacity> */}
       </View>
 
       {/* Lista */}
