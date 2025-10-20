@@ -14,7 +14,7 @@ import DashboardCliente from './src/screens/DashboardCliente';
 import MinhasSolicitacoes from './src/screens/MinhasSolicitacoes';
 import NovaSolicitacao from './src/screens/NovaSolicitacao';
 import PerfilCliente from './src/screens/PerfilCliente';
-import PropostasRecebidas from './src/screens/PropostasRecebidas';
+import PropostasRecebidas from './src/screens/Propostas';
 
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
