@@ -47,10 +47,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    fontSize: 16,
     color: '#283579',
-    marginBottom: 8,
-    fontWeight: '600',
+    marginBottom: 4,
+    fontWeight: 'bold',
   },
   row: {
     flexDirection: 'row',
@@ -72,6 +71,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 14,
-    color: '#ffffff',
+    color: '#283579',
   },
 });

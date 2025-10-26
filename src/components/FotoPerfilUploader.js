@@ -65,10 +65,10 @@ export default function FotoPerfilUploader({ fotoAtual }) {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={imagem ? { uri: imagem } : require('../../assets/default-profile.png')}
+      {/* <Image
+        source={imagem ? { uri: imagem } : require('../../assets/default_profile.png')}
         style={styles.imagem}
-      />
+      /> */}
       <Button title="Alterar Foto de Perfil" onPress={escolherImagem} color="#f5a522" />
     </View>
   );

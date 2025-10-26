@@ -1,5 +1,4 @@
-// DashboardCliente.js
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,

@@ -11,26 +11,32 @@ import DashboardCliente from './src/screens/DashboardCliente';
 import MinhasSolicitacoes from './src/screens/MinhasSolicitacoes';
 import NovaSolicitacao from './src/screens/NovaSolicitacao';
 import PerfilCliente from './src/screens/PerfilCliente';
-import PropostasRecebidas from './src/screens/Propostas';
-const { MaterialIcons } = require('@expo/vector-icons');
+import PropostasRecebidas from './src/screens/PropostasRecebidas';
+import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 // Stack para a aba "Serviços"
+// Stack para a aba "Serviços"
 function DashStack() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: '#1976D2' }, // cor de fundo do header
-        headerTintColor: '#fff', // cor do texto/título
-        headerTitleAlign: 'center', // centraliza o título
+        headerStyle: { backgroundColor: '#0a112e' },
+        headerTintColor: '#fff',
+        headerTitleAlign: 'center',
       }}
     >
       <Stack.Screen
         name="DashboardCliente"
         component={DashboardCliente}
         options={{ title: 'Dashboard Cliente' }}
+      />
+      <Stack.Screen
+        name="MinhasSolicitacoes"
+        component={MinhasSolicitacoes}
+        options={{ title: 'Minhas Solicitações' }}
       />
       <Stack.Screen
         name="PropostasRecebidas"
@@ -40,21 +46,27 @@ function DashStack() {
       <Stack.Screen
         name="NovaSolicitacao"
         component={NovaSolicitacao}
-        options={{ title: 'Nova Solicitacao' }}
+        options={{ title: 'Nova Solicitação' }}
       />
       <Stack.Screen
         name="PerfilCliente"
         component={PerfilCliente}
-        options={{ title: 'PerfilCliente' }}
+        options={{ title: 'Perfil do Cliente' }}
       />
     </Stack.Navigator>
   );
 }
 
-// Stack para a aba "Perfil"
 function NovoServicoStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+        screenOptions={{
+        headerStyle: { backgroundColor: '#0a112e' }, // cor de fundo do header
+        headerTintColor: '#fff', // cor do texto/título
+        headerTitleAlign: 'center', // centraliza o título
+      }}
+    >
+      <Stack.Screen name="Propostas" component={PropostasRecebidas} />
       <Stack.Screen name="NovaSolicitacao" component={NovaSolicitacao} />
       <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
       <Stack.Screen name="PerfilCliente" component={PerfilCliente} />
@@ -69,7 +81,7 @@ function AuthRoutes() {
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
-      <Stack.Screen name="NovaSolicitacao" component={NovaSolicitacao} />
+      {/* <Stack.Screen name="NovaSolicitacao" component={NovaSolicitacao} /> */}
       <Stack.Screen name="DashboardCliente" component={DashboardCliente} />
     </Stack.Navigator>
   );
@@ -87,23 +99,21 @@ function MainRoutes() {
 
           if (route.name === 'Dashboard') {
             iconName = 'home';
-          } else if (route.name === 'Minhas Solicitações') {
-            iconName = 'list-alt';
-          } else if (route.name === 'Nova Solicitação') {
-            iconName = 'add-circle-outline';
+          } else if (route.name === 'Solicitações') {
+            iconName = 'document-text-outline';
+          } else if (route.name === 'Propostas') {
+            iconName = 'cash-outline';
           }
 
-          // Usando MaterialIcons do @expo/vector-icons
-          // Certifique-se de instalar: expo install @expo/vector-icons
-          return <MaterialIcons name={iconName} size={size} color={color} />;
+          return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#1976D2',
         tabBarInactiveTintColor: 'gray',
       })}
     >
       <Tab.Screen name="Dashboard" component={DashStack} options={{ headerShown: false }} />
-      <Tab.Screen name="Minhas Solicitações" component={MinhasSolicitacoes} />
-      <Tab.Screen name="Nova Solicitação" component={NovoServicoStack} options={{ headerShown: false }} />
+      <Tab.Screen name="Solicitações" component={MinhasSolicitacoes} />
+      <Tab.Screen name="Propostas" component={NovoServicoStack} options={{ headerShown: false }} />
     </Tab.Navigator>
   );
 }
@@ -112,7 +122,7 @@ function MainRoutes() {
 function Rotas() {
   const { usuario, carregando } = useContext(AuthContext);
 
-  if (carregando) return null; // ou um componente de loading
+  if (carregando) return null;
 
   return usuario ? <MainRoutes /> : <AuthRoutes />;
 }
