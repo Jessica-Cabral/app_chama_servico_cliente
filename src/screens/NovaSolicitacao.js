@@ -27,6 +27,7 @@ import {
   criarSolicitacao,
   atualizarSolicitacao,
   enviarImagemSolicitacao,
+  buscarSolicitacaoPorId
 } from '../services/solicitacoes';
 
 export default function NovaSolicitacao({ route, navigation }) {
@@ -48,9 +49,11 @@ export default function NovaSolicitacao({ route, navigation }) {
   const [orcamento, setOrcamento] = useState(solicitacao?.orcamento_estimado?.toString() ?? '');
   const [urgencia, setUrgencia] = useState(solicitacao?.urgencia ?? 'media');
   const [imagens, setImagens] = useState([]);
+  const [imagensExistentes, setImagensExistentes] = useState([]);
   const [resumo, setResumo] = useState(null);
   const [erros, setErros] = useState({});
   const [carregando, setCarregando] = useState(false);
+  const [carregandoImagens, setCarregandoImagens] = useState(false);
 
   // Estados para data/hora
   const [dataAtendimento, setDataAtendimento] = useState(
@@ -71,13 +74,40 @@ export default function NovaSolicitacao({ route, navigation }) {
         }
 
         await carregarEnderecos();
+        
+        // Se estiver editando, carregar imagens existentes
+        if (solicitacao?.id) {
+          await carregarImagensSolicitacao();
+        }
       } catch (error) {
-       // console.error('Erro ao carregar dados:', error);
+        console.error('Erro ao carregar dados:', error);
         Alert.alert('Erro', 'Não foi possível carregar os dados necessários');
       }
     }
     carregarDados();
-  }, [cliente_id, token]);
+  }, [cliente_id, token, solicitacao]);
+
+  const carregarImagensSolicitacao = async () => {
+    if (!solicitacao?.id) return;
+    
+    try {
+      setCarregandoImagens(true);
+      const resultado = await buscarSolicitacaoPorId(solicitacao.id, token);
+      
+      if (resultado.sucesso && resultado.solicitacao.imagens) {
+        const imagensFormatadas = resultado.solicitacao.imagens.map(img => ({
+          id: img.id,
+          uri: `https://chamaservico.tds104-senac.online/uploads/solicitacoes/${img.caminho_imagem}`,
+          tipo: 'existente'
+        }));
+        setImagensExistentes(imagensFormatadas);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar imagens:', error);
+    } finally {
+      setCarregandoImagens(false);
+    }
+  };
 
   const carregarEnderecos = async () => {
     try {
@@ -90,7 +120,7 @@ export default function NovaSolicitacao({ route, navigation }) {
         setEnderecos(enderecosFormatados);
       }
     } catch (error) {
-     // console.error('Erro ao carregar endereços:', error);
+      console.error('Erro ao carregar endereços:', error);
     }
   };
 
@@ -98,7 +128,7 @@ export default function NovaSolicitacao({ route, navigation }) {
     if (novoEnderecoId) {
       setEnderecoId(novoEnderecoId);
     }
-    carregarEnderecos(); // Recarregar a lista de endereços
+    carregarEnderecos();
   };
 
   // Funções para data/hora
@@ -149,24 +179,62 @@ export default function NovaSolicitacao({ route, navigation }) {
         return;
       }
 
+      const totalImagens = imagens.length + imagensExistentes.length;
+      const selectionLimit = 5 - totalImagens;
+
+      if (selectionLimit <= 0) {
+        Alert.alert('Limite atingido', 'Você pode adicionar no máximo 5 imagens por solicitação.');
+        return;
+      }
+
       const resultado = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsMultipleSelection: true,
         quality: 0.7,
-        selectionLimit: 5,
+        selectionLimit: selectionLimit,
       });
 
       if (!resultado.canceled && resultado.assets) {
-        setImagens(prev => [...prev, ...resultado.assets]);
+        const novasImagens = resultado.assets.map(asset => ({
+          ...asset,
+          tipo: 'nova'
+        }));
+        setImagens(prev => [...prev, ...novasImagens]);
       }
     } catch (error) {
-     // console.error('Erro ao selecionar imagens:', error);
+      console.error('Erro ao selecionar imagens:', error);
       Alert.alert('Erro', 'Não foi possível selecionar as imagens');
     }
   };
 
-  const removerImagem = (index) => {
-    setImagens(prev => prev.filter((_, i) => i !== index));
+  const removerImagem = (index, tipo) => {
+    if (tipo === 'existente') {
+      setImagensExistentes(prev => prev.filter((_, i) => i !== index));
+    } else {
+      setImagens(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const removerImagemExistente = async (imagemId, index) => {
+    try {
+      Alert.alert(
+        "Remover Imagem",
+        "Deseja remover esta imagem?",
+        [
+          { text: "Cancelar", style: "cancel" },
+          { 
+            text: "Remover", 
+            style: "destructive",
+            onPress: () => {
+              setImagensExistentes(prev => prev.filter((_, i) => i !== index));
+            }
+          }
+        ]
+      );
+    } catch (error) {
+      console.error('Erro ao remover imagem:', error);
+      Alert.alert('Erro', 'Não foi possível remover a imagem');
+    }
   };
 
   const gerarResumo = () => {
@@ -185,7 +253,8 @@ export default function NovaSolicitacao({ route, navigation }) {
       orcamento,
       dataAtendimento: formatarDataHora(dataAtendimento),
       urgencia,
-      imagens,
+      imagens: [...imagensExistentes, ...imagens],
+      totalImagens: imagensExistentes.length + imagens.length
     });
   };
 
@@ -198,6 +267,7 @@ export default function NovaSolicitacao({ route, navigation }) {
     setDataAtendimento(new Date());
     setUrgencia('media');
     setImagens([]);
+    setImagensExistentes([]);
     setResumo(null);
     setErros({});
   };
@@ -222,20 +292,29 @@ export default function NovaSolicitacao({ route, navigation }) {
         data_atendimento: dataAtendimento.toISOString().slice(0, 19).replace('T', ' '),
       };
 
+      console.log('Enviando dados:', dados);
+      console.log('Editando solicitação?', !!solicitacao?.id);
+      console.log('ID da solicitação:', solicitacao?.id);
+
       let resultado;
       if (solicitacao?.id) {
+        // Para edição - inclui o ID da solicitação
+        dados.solicitacao_id = solicitacao.id;
         resultado = await atualizarSolicitacao(solicitacao.id, dados, token);
       } else {
+        // Para criação nova
         resultado = await criarSolicitacao(dados, token);
       }
+
+      console.log('Resposta da API:', resultado);
 
       if (resultado.sucesso) {
         const solicitacao_id = resultado.solicitacao_id || solicitacao?.id;
         
-        // Enviar imagens se houver
+        // Enviar novas imagens se houver
         if (imagens.length > 0 && solicitacao_id) {
           for (const img of imagens) {
-            if (img.uri) {
+            if (img.uri && img.tipo === 'nova') {
               await enviarImagemSolicitacao(solicitacao_id, img.uri, token);
             }
           }
@@ -249,7 +328,6 @@ export default function NovaSolicitacao({ route, navigation }) {
               text: "OK",
               onPress: () => {
                 limparFormulario();
-                // direciona para tela Minhas Solicitações ao puclicar solicitação
                 navigation.navigate("MinhasSolicitacoes");
               }
             }
@@ -259,6 +337,7 @@ export default function NovaSolicitacao({ route, navigation }) {
         Alert.alert("Erro", resultado.erro || "Erro ao salvar solicitação.");
       }
     } catch (error) {
+      console.error('Erro ao salvar solicitação:', error);
       Alert.alert("Erro", "Erro ao conectar com o servidor.");
     } finally {
       setCarregando(false);
@@ -398,20 +477,24 @@ export default function NovaSolicitacao({ route, navigation }) {
 
         <SecaoFormulario titulo="Imagens">
           <Botao 
-            title="Selecionar Imagens" 
+            title="Selecionar Novas Imagens" 
             onPress={selecionarImagens} 
             variante="outline" 
           />
-          {imagens.length > 0 && (
+          
+          {/* Imagens Existentes */}
+          {imagensExistentes.length > 0 && (
             <View style={styles.imagensContainer}>
-              <Text style={styles.imagensTitulo}>{imagens.length} imagem(ns) selecionada(s)</Text>
+              <Text style={styles.imagensTitulo}>
+                Imagens existentes ({imagensExistentes.length})
+              </Text>
               <ScrollView horizontal style={styles.imagemPreviewContainer}>
-                {imagens.map((img, index) => (
-                  <View key={index} style={styles.imagemItem}>
+                {imagensExistentes.map((img, index) => (
+                  <View key={`existente-${img.id}`} style={styles.imagemItem}>
                     <Image source={{ uri: img.uri }} style={styles.imagemPreview} />
                     <TouchableOpacity 
                       style={styles.removerImagemBtn}
-                      onPress={() => removerImagem(index)}
+                      onPress={() => removerImagemExistente(img.id, index)}
                     >
                       <Text style={styles.removerImagemTexto}>×</Text>
                     </TouchableOpacity>
@@ -420,6 +503,42 @@ export default function NovaSolicitacao({ route, navigation }) {
               </ScrollView>
             </View>
           )}
+
+          {/* Novas Imagens */}
+          {imagens.length > 0 && (
+            <View style={styles.imagensContainer}>
+              <Text style={styles.imagensTitulo}>
+                Novas imagens selecionadas ({imagens.length})
+              </Text>
+              <ScrollView horizontal style={styles.imagemPreviewContainer}>
+                {imagens.map((img, index) => (
+                  <View key={`nova-${index}`} style={styles.imagemItem}>
+                    <Image source={{ uri: img.uri }} style={styles.imagemPreview} />
+                    <TouchableOpacity 
+                      style={styles.removerImagemBtn}
+                      onPress={() => removerImagem(index, 'nova')}
+                    >
+                      <Text style={styles.removerImagemTexto}>×</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+          {(imagensExistentes.length === 0 && imagens.length === 0) && (
+            <Text style={styles.semImagensTexto}>
+              Nenhuma imagem selecionada. Você pode adicionar até 5 imagens.
+            </Text>
+          )}
+
+          {carregandoImagens && (
+            <Text style={styles.carregandoTexto}>Carregando imagens...</Text>
+          )}
+
+          <Text style={styles.infoImagens}>
+            Total: {imagensExistentes.length + imagens.length}/5 imagens
+          </Text>
         </SecaoFormulario>
 
         <Botao 
@@ -437,7 +556,7 @@ export default function NovaSolicitacao({ route, navigation }) {
             <Text style={styles.resumoTexto}>Orçamento: R$ {resumo.orcamento || '0,00'}</Text>
             <Text style={styles.resumoTexto}>Data: {resumo.dataAtendimento}</Text>
             <Text style={styles.resumoTexto}>Urgência: {resumo.urgencia}</Text>
-            <Text style={styles.resumoTexto}>Imagens: {resumo.imagens.length}</Text>
+            <Text style={styles.resumoTexto}>Imagens: {resumo.totalImagens}</Text>
           </SecaoFormulario>
         )}
 
@@ -482,6 +601,7 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     marginBottom: 8,
     fontSize: 14,
+    fontWeight: '600',
   },
   imagemPreviewContainer: {
     marginVertical: 8,
@@ -512,17 +632,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   resumoTexto: {
-    color: "#ffffff",
+    color: "#283579",
     marginBottom: 6,
     fontSize: 14,
   },
-  // Estilos para data/hora
   dataHoraContainer: {
     marginBottom: 16,
   },
   dataHoraLabel: {
-    color: '#283579',
-    marginBottom: 4,
+    color: '#ffffff',
+    marginBottom: 8,
     fontWeight: 'bold',
   },
   dataHoraBotoes: {
@@ -543,5 +662,23 @@ const styles = StyleSheet.create({
     color: '#283579',
     fontSize: 14,
     fontWeight: '500',
+  },
+  carregandoTexto: {
+    color: '#ffffff',
+    textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
+  },
+  semImagensTexto: {
+    color: '#cccccc',
+    textAlign: 'center',
+    marginTop: 16,
+    fontStyle: 'italic',
+  },
+  infoImagens: {
+    color: '#ffffff',
+    textAlign: 'center',
+    marginTop: 8,
+    fontSize: 12,
   },
 });

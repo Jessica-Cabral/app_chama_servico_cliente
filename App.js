@@ -1,3 +1,4 @@
+// App.js - VERSÃO CORRIGIDA
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -17,8 +18,31 @@ import { Ionicons } from '@expo/vector-icons';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// Stack para a aba "Serviços"
-// Stack para a aba "Serviços"
+// Stack para Solicitações (inclui MinhasSolicitacoes e NovaSolicitacao)
+function SolicitacoesStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#0a112e' },
+        headerTintColor: '#fff',
+        headerTitleAlign: 'center',
+      }}
+    >
+      <Stack.Screen
+        name="MinhasSolicitacoes"
+        component={MinhasSolicitacoes}
+        options={{ title: 'Minhas Solicitações' }}
+      />
+      <Stack.Screen
+        name="NovaSolicitacao"
+        component={NovaSolicitacao}
+        options={{ title: 'Nova Solicitação' }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+// Stack para Dashboard
 function DashStack() {
   return (
     <Stack.Navigator
@@ -34,21 +58,6 @@ function DashStack() {
         options={{ title: 'Dashboard Cliente' }}
       />
       <Stack.Screen
-        name="MinhasSolicitacoes"
-        component={MinhasSolicitacoes}
-        options={{ title: 'Minhas Solicitações' }}
-      />
-      <Stack.Screen
-        name="PropostasRecebidas"
-        component={PropostasRecebidas}
-        options={{ title: 'Propostas Recebidas' }}
-      />
-      <Stack.Screen
-        name="NovaSolicitacao"
-        component={NovaSolicitacao}
-        options={{ title: 'Nova Solicitação' }}
-      />
-      <Stack.Screen
         name="PerfilCliente"
         component={PerfilCliente}
         options={{ title: 'Perfil do Cliente' }}
@@ -57,38 +66,26 @@ function DashStack() {
   );
 }
 
-function NovoServicoStack() {
+// Stack para Propostas
+function PropostasStack() {
   return (
     <Stack.Navigator
-        screenOptions={{
-        headerStyle: { backgroundColor: '#0a112e' }, // cor de fundo do header
-        headerTintColor: '#fff', // cor do texto/título
-        headerTitleAlign: 'center', // centraliza o título
+      screenOptions={{
+        headerStyle: { backgroundColor: '#0a112e' },
+        headerTintColor: '#fff',
+        headerTitleAlign: 'center',
       }}
     >
-      <Stack.Screen name="Propostas" component={PropostasRecebidas} />
-      <Stack.Screen name="NovaSolicitacao" component={NovaSolicitacao} />
-      <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
-      <Stack.Screen name="PerfilCliente" component={PerfilCliente} />
+      <Stack.Screen
+        name="PropostasRecebidas"
+        component={PropostasRecebidas}
+        options={{ title: 'Propostas Recebidas' }}
+      />
     </Stack.Navigator>
   );
 }
 
-// Rotas de autenticação (sem abas)
-function AuthRoutes() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
-      {/* <Stack.Screen name="NovaSolicitacao" component={NovaSolicitacao} /> */}
-      <Stack.Screen name="DashboardCliente" component={DashboardCliente} />
-    </Stack.Navigator>
-  );
-}
-
-
-// Rotas principais com abas
+// Rotas principais com abas - VERSÃO CORRIGIDA
 function MainRoutes() {
   return (
     <Tab.Navigator
@@ -112,9 +109,20 @@ function MainRoutes() {
       })}
     >
       <Tab.Screen name="Dashboard" component={DashStack} options={{ headerShown: false }} />
-      <Tab.Screen name="Solicitações" component={MinhasSolicitacoes} />
-      <Tab.Screen name="Propostas" component={NovoServicoStack} options={{ headerShown: false }} />
+      <Tab.Screen name="Solicitações" component={SolicitacoesStack} options={{ headerShown: false }} />
+      <Tab.Screen name="Propostas" component={PropostasStack} options={{ headerShown: false }} />
     </Tab.Navigator>
+  );
+}
+
+// Rotas de autenticação (sem abas)
+function AuthRoutes() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
+    </Stack.Navigator>
   );
 }
 
@@ -127,7 +135,6 @@ function Rotas() {
   return usuario ? <MainRoutes /> : <AuthRoutes />;
 }
 
-
 export default function App() {
   return (
     <AuthProvider>
@@ -135,7 +142,5 @@ export default function App() {
         <Rotas />
       </NavigationContainer>
     </AuthProvider>
-
-
   );
 }

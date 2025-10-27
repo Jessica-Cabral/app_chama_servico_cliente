@@ -8,7 +8,8 @@ import {
   TextInput,
   ScrollView,
   Alert,
-  Modal
+  Modal,
+  RefreshControl
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,9 +22,17 @@ const MinhasSolicitacoes = ({ navigation }) => {
   const [buscaTexto, setBuscaTexto] = useState("");
   const [modalDetalhesVisivel, setModalDetalhesVisivel] = useState(false);
   const [solicitacaoSelecionada, setSolicitacaoSelecionada] = useState(null);
+  const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
+  const [solicitacaoEditar, setSolicitacaoEditar] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     buscarSolicitacoes();
+    
+    // Atualizar a cada 30 segundos para status
+    const intervalo = setInterval(buscarSolicitacoes, 30000);
+    
+    return () => clearInterval(intervalo);
   }, [usuario, token]);
 
   const buscarSolicitacoes = async () => {
@@ -50,8 +59,31 @@ const MinhasSolicitacoes = ({ navigation }) => {
       Alert.alert("Erro", "Erro ao conectar com o servidor");
     } finally {
       setCarregando(false);
+      setRefreshing(false);
     }
   };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    buscarSolicitacoes();
+  }, []);
+
+// Verificar se pode editar/excluir - APENAS status "Aguardando proposta"
+const podeEditarExcluir = (solicitacao) => {
+  // Verifica por status_id (se disponível) ou por string do status
+  const status = solicitacao.status?.toLowerCase() || solicitacao.status_nome?.toLowerCase() || '';
+  
+  // Status que permitem edição/exclusão
+  const statusPermitidos = [
+    'aguardando', 
+    'aguardando propostas', 
+    'pendente', 
+    'em análise',
+    '1' // status_id = 1
+  ];
+  
+  return statusPermitidos.some(perm => status.includes(perm));
+};
 
   const statusOpcoes = [
     { label: "Todos", value: "todos" },
@@ -66,9 +98,11 @@ const MinhasSolicitacoes = ({ navigation }) => {
     switch (statusLower) {
       case 'aguardando':
       case 'pendente':
+      case 'em análise':
         return { label: "Aguardando Propostas", cor: "#f5a522", icone: "time-outline" };
       case 'andamento':
       case 'em_andamento':
+      case 'em andamento':
         return { label: "Em Andamento", cor: "#007bff", icone: "sync-outline" };
       case 'concluido':
       case 'concluído':
@@ -98,16 +132,29 @@ const MinhasSolicitacoes = ({ navigation }) => {
   const aplicarFiltros = () => {
     let filtradas = [...solicitacoes];
 
-    // Filtro por status
+    // Filtro por status - CORREÇÃO
     if (filtroStatus !== "todos") {
       filtradas = filtradas.filter(s => {
-        const statusNormalizado = s.status?.toLowerCase().replace(/[^a-z]/g, '');
-        const filtroNormalizado = filtroStatus.toLowerCase().replace(/[^a-z]/g, '');
-        return statusNormalizado === filtroNormalizado;
+        const status = s.status?.toLowerCase() || s.status_nome?.toLowerCase() || '';
+        const filtro = filtroStatus.toLowerCase();
+        
+        // Mapeamento de filtros para status reais
+        const mapeamento = {
+          'aguardando': ['aguardando', 'pendente', 'em análise'],
+          'andamento': ['andamento', 'em andamento', 'em_andamento'],
+          'concluido': ['concluido', 'concluído'],
+          'cancelado': ['cancelado']
+        };
+        
+        if (mapeamento[filtro]) {
+          return mapeamento[filtro].some(statusPermitido => status.includes(statusPermitido));
+        }
+        
+        return status.includes(filtro);
       });
     }
 
-    // Filtro por busca
+    // Filtro por busca (mantido igual)
     if (buscaTexto.trim() !== "") {
       const texto = buscaTexto.toLowerCase();
       filtradas = filtradas.filter(
@@ -119,7 +166,7 @@ const MinhasSolicitacoes = ({ navigation }) => {
     }
 
     return filtradas;
-  };
+  }; 
 
   const formatarData = (dataString) => {
     if (!dataString) return "Data não informada";
@@ -140,10 +187,11 @@ const MinhasSolicitacoes = ({ navigation }) => {
 
   const formatarMoeda = (valor) => {
     if (!valor) return "R$ 0,00";
+    const valorNumerico = typeof valor === 'string' ? parseFloat(valor.replace(',', '.')) : valor;
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-    }).format(valor);
+    }).format(valorNumerico);
   };
 
   const handleVerDetalhes = (solicitacao) => {
@@ -152,15 +200,34 @@ const MinhasSolicitacoes = ({ navigation }) => {
   };
 
   const handleEditar = (solicitacao) => {
-    navigation.navigate('NovaSolicitacao', { 
-      solicitacao: {
-        ...solicitacao,
-        tipo_servico_id: solicitacao.tipo_servico_id || solicitacao.tipo_servico
-      } 
+    if (podeEditarExcluir(solicitacao)) {
+      // Navega para a aba "Solicitações" que tem acesso à NovaSolicitacao
+     navigation.navigate('NovaSolicitacao', { 
+      solicitacao: solicitacao 
+    });
+    } else {
+      Alert.alert(
+        "Edição não permitida",
+      );
+    }
+  };
+
+  const handleNovaSolicitacao = () => {
+    // Navega para a aba "Solicitações" que tem acesso à NovaSolicitacao
+    navigation.navigate('Solicitações', { 
+      screen: 'NovaSolicitacao'
     });
   };
 
   const handleExcluir = (solicitacao) => {
+    if (!podeEditarExcluir(solicitacao)) {
+      Alert.alert(
+        "Exclusão não permitida",
+        "Esta solicitação não pode ser excluída pois não está mais aguardando propostas."
+      );
+      return;
+    }
+
     Alert.alert(
       "Excluir Solicitação",
       `Tem certeza que deseja excluir a solicitação "${solicitacao.titulo}"?`,
@@ -207,11 +274,23 @@ const MinhasSolicitacoes = ({ navigation }) => {
   };
 
   const handleVerPropostas = (solicitacao) => {
-    navigation.navigate('Propostas', { 
-      filtroSolicitacao: solicitacao.id 
-    });
+    // Verifica se a tela de Propostas existe antes de navegar
+    if (navigation && typeof navigation.navigate === 'function') {
+      navigation.navigate('Propostas', { 
+        filtroSolicitacao: solicitacao.id 
+      });
+    } else {
+      Alert.alert("Aviso", "Funcionalidade de propostas não disponível");
+    }
   };
 
+  const handleAtualizar = () => {
+    buscarSolicitacoes();
+    Alert.alert("Sucesso", "Lista atualizada!");
+  };
+
+
+  // Modal de Detalhes
   const ModalDetalhes = () => (
     <Modal
       animationType="slide"
@@ -245,25 +324,35 @@ const MinhasSolicitacoes = ({ navigation }) => {
               
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Tipo de Serviço:</Text>
-                <Text style={styles.detalheValor}>{solicitacaoSelecionada.tipo_servico}</Text>
+                <Text style={styles.detalheValor}>
+                  {solicitacaoSelecionada.tipo_servico || solicitacaoSelecionada.tipo_servico_nome || "Não informado"}
+                </Text>
               </View>
               
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Endereço:</Text>
-                <Text style={styles.detalheValor}>{solicitacaoSelecionada.endereco || "Não informado"}</Text>
+                <Text style={styles.detalheValor}>
+                  {solicitacaoSelecionada.endereco || 
+                   `${solicitacaoSelecionada.logradouro || ''} ${solicitacaoSelecionada.numero || ''}, ${solicitacaoSelecionada.bairro || ''}`.trim() || 
+                   "Não informado"}
+                </Text>
               </View>
               
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Data de Criação:</Text>
-                <Text style={styles.detalheValor}>{formatarData(solicitacaoSelecionada.data_criacao)}</Text>
+                <Text style={styles.detalheValor}>
+                  {formatarData(solicitacaoSelecionada.data_criacao || solicitacaoSelecionada.data_solicitacao)}
+                </Text>
               </View>
               
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Status:</Text>
                 <View style={styles.statusContainer}>
-                  <View style={[styles.statusBadge, { backgroundColor: obterStatusInfo(solicitacaoSelecionada.status).cor }]}>
-                    <Ionicons name={obterStatusInfo(solicitacaoSelecionada.status).icone} size={14} color="#fff" />
-                    <Text style={styles.statusText}>{obterStatusInfo(solicitacaoSelecionada.status).label}</Text>
+                  <View style={[styles.statusBadge, { backgroundColor: obterStatusInfo(solicitacaoSelecionada.status || solicitacaoSelecionada.status_nome).cor }]}>
+                    <Ionicons name={obterStatusInfo(solicitacaoSelecionada.status || solicitacaoSelecionada.status_nome).icone} size={14} color="#fff" />
+                    <Text style={styles.statusText}>
+                      {obterStatusInfo(solicitacaoSelecionada.status || solicitacaoSelecionada.status_nome).label}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -280,7 +369,12 @@ const MinhasSolicitacoes = ({ navigation }) => {
                 </View>
               </View>
               
-              {solicitacaoSelecionada.orcamento_estimado > 0 && (
+              <View style={styles.detalheItem}>
+                <Text style={styles.detalheLabel}>Propostas Recebidas:</Text>
+                <Text style={styles.detalheValor}>{solicitacaoSelecionada.total_propostas || 0}</Text>
+              </View>
+              
+              {(solicitacaoSelecionada.orcamento_estimado > 0 || solicitacaoSelecionada.orcamento_estimado) && (
                 <View style={styles.detalheItem}>
                   <Text style={styles.detalheLabel}>Orçamento Estimado:</Text>
                   <Text style={styles.detalheValor}>{formatarMoeda(solicitacaoSelecionada.orcamento_estimado)}</Text>
@@ -294,15 +388,16 @@ const MinhasSolicitacoes = ({ navigation }) => {
   );
 
   const renderItem = ({ item }) => {
-    const statusInfo = obterStatusInfo(item.status);
+    const statusInfo = obterStatusInfo(item.status || item.status_nome);
     const urgenciaInfo = obterUrgenciaInfo(item.urgencia);
+    const podeEditar = podeEditarExcluir(item);
 
     return (
       <View style={styles.card}>
         {/* Cabeçalho com data e status */}
         <View style={styles.cardHeader}>
           <Text style={styles.cardData}>
-            {formatarData(item.data_criacao || item.data_atendimento)}
+            {formatarData(item.data_criacao || item.data_atendimento || item.data_solicitacao)}
           </Text>
           <View style={[styles.statusBadge, { backgroundColor: statusInfo.cor }]}>
             <Ionicons name={statusInfo.icone} size={14} color="#fff" />
@@ -320,7 +415,7 @@ const MinhasSolicitacoes = ({ navigation }) => {
           <View style={styles.detalhesRow}>
             <View style={styles.detalheItem}>
               <Ionicons name="business-outline" size={16} color="#4e5264" />
-              <Text style={styles.detalheTexto}>{item.tipo_servico || "Serviço"}</Text>
+              <Text style={styles.detalheTexto}>{item.tipo_servico || item.tipo_servico_nome || "Serviço"}</Text>
             </View>
             
             <View style={styles.detalheItem}>
@@ -335,11 +430,13 @@ const MinhasSolicitacoes = ({ navigation }) => {
             <View style={styles.detalheItem}>
               <Ionicons name="location-outline" size={16} color="#4e5264" />
               <Text style={styles.detalheTexto}>
-                {item.endereco || "Asa Sul, DF"}
+                {item.endereco || 
+                 `${item.logradouro || ''} ${item.numero || ''}, ${item.bairro || ''}`.trim() || 
+                 "Asa Sul, DF"}
               </Text>
             </View>
             
-            {item.orcamento_estimado > 0 && (
+            {(item.orcamento_estimado > 0 || item.orcamento_estimado) && (
               <View style={styles.detalheItem}>
                 <Ionicons name="cash-outline" size={16} color="#4e5264" />
                 <Text style={styles.detalheTexto}>
@@ -348,9 +445,17 @@ const MinhasSolicitacoes = ({ navigation }) => {
               </View>
             )}
           </View>
+
+          {/* Informação de propostas */}
+          <View style={styles.propostasInfo}>
+            <Ionicons name="document-text-outline" size={14} color="#4e5264" />
+            <Text style={styles.propostasInfoTexto}>
+              {item.total_propostas || 0} proposta(s) recebida(s)
+            </Text>
+          </View>
         </View>
 
-        {/* Ações */}
+        {/* Ações - Botões condicionais */}
         <View style={styles.cardAcoes}>
           <TouchableOpacity 
             style={styles.acaoBtn}
@@ -360,21 +465,27 @@ const MinhasSolicitacoes = ({ navigation }) => {
             <Text style={styles.acaoTexto}>Ver</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.acaoBtn}
-            onPress={() => handleEditar(item)}
-          >
-            <Ionicons name="create-outline" size={16} color="#f5a522" />
-            <Text style={styles.acaoTexto}>Editar</Text>
-          </TouchableOpacity>
+          {/* Botão Editar - APENAS se status for "Aguardando proposta" */}
+          {podeEditar && (
+            <TouchableOpacity 
+              style={styles.acaoBtn}
+              onPress={() => handleEditar(item)}
+            >
+              <Ionicons name="create-outline" size={16} color="#f5a522" />
+              <Text style={styles.acaoTexto}>Editar</Text>
+            </TouchableOpacity>
+          )}
 
-          <TouchableOpacity 
-            style={styles.acaoBtn}
-            onPress={() => handleExcluir(item)}
-          >
-            <Ionicons name="trash-outline" size={16} color="#dc3545" />
-            <Text style={styles.acaoTexto}>Excluir</Text>
-          </TouchableOpacity>
+          {/* Botão Excluir - APENAS se status for "Aguardando proposta" */}
+          {podeEditar && (
+            <TouchableOpacity 
+              style={styles.acaoBtn}
+              onPress={() => handleExcluir(item)}
+            >
+              <Ionicons name="trash-outline" size={16} color="#dc3545" />
+              <Text style={styles.acaoTexto}>Excluir</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Botão Ver Propostas */}
@@ -390,7 +501,7 @@ const MinhasSolicitacoes = ({ navigation }) => {
     );
   };
 
-  if (carregando) {
+  if (carregando && !refreshing) {
     return (
       <View style={styles.loading}>
         <Ionicons name="refresh-outline" size={40} color="#f5a522" />
@@ -406,15 +517,33 @@ const MinhasSolicitacoes = ({ navigation }) => {
       {/* Header com botão de nova solicitação */}
       <View style={styles.header}>
         <Text style={styles.titulo}>Minhas Solicitações</Text>
-        <TouchableOpacity 
-          style={styles.novoBtn}
-          onPress={() => navigation.navigate('NovaSolicitacao')}
-        >
-          <Ionicons name="add" size={24} color="#fff" />
-        </TouchableOpacity>
+        <View style={styles.headerAcoes}>
+          <TouchableOpacity 
+            style={styles.atualizarBtn}
+            onPress={handleAtualizar}
+          >
+            <Ionicons name="refresh" size={20} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.novoBtn}
+            onPress={handleNovaSolicitacao}
+          >
+            <Ionicons name="add" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView 
+        style={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#f5a522"]}
+            tintColor="#f5a522"
+          />
+        }
+      >
         {/* Filtros */}
         <View style={styles.filtrosContainer}>
           <Text style={styles.filtrosTitulo}>Filtros</Text>
@@ -468,7 +597,7 @@ const MinhasSolicitacoes = ({ navigation }) => {
             {solicitacoes.length === 0 && (
               <TouchableOpacity 
                 style={styles.novaSolicitacaoBtn}
-                onPress={() => navigation.navigate('NovaSolicitacao')}
+                onPress={handleNovaSolicitacao}
               >
                 <Text style={styles.novaSolicitacaoTexto}>Criar Primeira Solicitação</Text>
               </TouchableOpacity>
@@ -490,6 +619,7 @@ const MinhasSolicitacoes = ({ navigation }) => {
   );
 };
 
+// ... (os estilos permanecem EXATAMENTE os mesmos)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -509,8 +639,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#ffffff",
   },
+  headerAcoes: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  atualizarBtn: {
+    padding: 6,
+  },
   novoBtn: {
-    padding: 8,
+    padding: 6,
   },
   content: {
     flex: 1,
@@ -646,6 +784,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#4e5264",
   },
+  propostasInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 6,
+  },
+  propostasInfoTexto: {
+    fontSize: 12,
+    color: "#4e5264",
+    fontWeight: "500",
+  },
   cardAcoes: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -714,7 +866,6 @@ const styles = StyleSheet.create({
     color: "#4e5264",
     marginTop: 12,
   },
-  // Estilos do Modal
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -758,7 +909,7 @@ const styles = StyleSheet.create({
   },
   detalheValor: {
     fontSize: 16,
-    color: 'dataHoraLabel',
+    color: '#0a112e',
   },
   statusContainer: {
     flexDirection: 'row',

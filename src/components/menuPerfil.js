@@ -104,7 +104,7 @@ const MenuPerfil = ({ visible, onClose, navigation }) => {
                 icon="person-outline"
                 title="Ver Perfil"
                 onPress={() => {
-                  navigation.navigate('Perfil');
+                  navigation.navigate('PerfilCliente');
                   onClose();
                 }}
               />
