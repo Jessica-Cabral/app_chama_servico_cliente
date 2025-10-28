@@ -3,8 +3,6 @@
 const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/perfil';
 const ENDERECO_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/enderecos';
 
-//const { token } = useContext(AuthContext);
-
 export async function listarEnderecos(cliente_id, token) {
   try {
     const response = await fetch(`${API_URL}?cliente_id=${cliente_id}`, {
@@ -53,26 +51,11 @@ export async function buscarEnderecoPorCEP(cep) {
   }
 }
 
-// export async function cadastrarEndereco(cliente_id, cep, numero, complemento, principal = false) {
-//   try {
-//     const response = await fetch(ENDERECO_URL, {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json'
-//       },
-//       body: JSON.stringify({ cliente_id, cep, numero, complemento, principal })
-//     });
-
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     return { erro: 'Erro ao cadastrar endereço' };
-//   }
-// }
-
-// cadastro do endereço do cliente
+// CADASTRO COMPLETO DE ENDEREÇO - VERSÃO QUE FUNCIONOU
 export async function cadastrarEndereco(dados, token) {
   try {
+    console.log('📤 Enviando dados para cadastro:', dados);
+    
     const response = await fetch(ENDERECO_URL, {
       method: 'POST',
       headers: {
@@ -82,16 +65,36 @@ export async function cadastrarEndereco(dados, token) {
       body: JSON.stringify(dados)
     });
 
-    const data = await response.json();
+    console.log('📥 Status da resposta:', response.status);
+    
+    const responseText = await response.text();
+    console.log('📥 Resposta bruta:', responseText);
+
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('❌ Erro ao parsear JSON:', e);
+      return { erro: 'Resposta inválida do servidor' };
+    }
+
+    console.log('📥 Resposta parseada:', data);
+
+    if (!response.ok) {
+      return { 
+        erro: data.erro || `Erro HTTP ${response.status}: ${response.statusText}` 
+      };
+    }
+
     return data;
+
   } catch (error) {
-    console.error('Erro ao cadastrar endereço:', error);
-    return { erro: 'Erro ao cadastrar endereço' };
+    console.error('❌ Erro na requisição:', error);
+    return { erro: `Erro de conexão: ${error.message}` };
   }
 }
 
 //Definir endereço como principal
-
 export async function definirEnderecoPrincipal(cliente_id, endereco_id, token) {
   try {
     const response = await fetch(ENDERECO_URL, {

@@ -123,41 +123,100 @@ export default function ModalEndereco({
     return Object.keys(novosErros).length === 0;
   };
 
+  // const salvarNovoEndereco = async () => {
+  //   if (!validarEndereco()) {
+  //     Alert.alert('Erro', 'Preencha todos os campos obrigatórios do endereço');
+  //     return;
+  //   }
+
+  //   try {
+  //     const dadosEndereco = {
+  //       cliente_id: clienteId,
+  //       cep: novoEndereco.cep.replace(/\D/g, ''),
+  //       logradouro: novoEndereco.logradouro,
+  //       numero: novoEndereco.numero,
+  //       complemento: novoEndereco.complemento,
+  //       bairro: novoEndereco.bairro,
+  //       cidade: novoEndereco.cidade,
+  //       estado: novoEndereco.estado,
+  //       principal: novoEndereco.principal
+  //     };
+
+  //     const resultado = await cadastrarEndereco(dadosEndereco, token);
+
+  //     if (resultado.sucesso) {
+  //       Alert.alert('Sucesso', 'Endereço cadastrado com sucesso!');
+  //       onEnderecoCadastrado(resultado.endereco_id);
+  //       limparFormulario();
+  //       onClose();
+  //     } else {
+  //       Alert.alert('Erro', resultado.erro || 'Erro ao cadastrar endereço');
+  //     }
+  //   } catch (error) {
+  //     console.error('Erro ao salvar endereço:', error);
+  //     Alert.alert('Erro', 'Erro ao conectar com o servidor');
+  //   }
+  // };
+
+  //para teste
+
   const salvarNovoEndereco = async () => {
     if (!validarEndereco()) {
       Alert.alert('Erro', 'Preencha todos os campos obrigatórios do endereço');
       return;
     }
 
-    try {
-      const dadosEndereco = {
-        cliente_id: clienteId,
-        cep: novoEndereco.cep.replace(/\D/g, ''),
-        logradouro: novoEndereco.logradouro,
-        numero: novoEndereco.numero,
-        complemento: novoEndereco.complemento,
-        bairro: novoEndereco.bairro,
-        cidade: novoEndereco.cidade,
-        estado: novoEndereco.estado,
-        principal: novoEndereco.principal
-      };
+  // DEBUG CRÍTICO - verifique se os dados chegam corretamente
+  console.log('=== DEBUG MODAL ENDERECO ===');
+  console.log('clienteId recebido:', clienteId);
+  console.log('clienteId tipo:', typeof clienteId);
+  console.log('token recebido:', token ? 'PRESENTE' : 'AUSENTE');
+  console.log('token valor:', token);
+  console.log('dados endereço:', novoEndereco);
+  console.log('============================');
 
-      const resultado = await cadastrarEndereco(dadosEndereco, token);
+  if (!clienteId) {
+    Alert.alert('Erro', 'ID do cliente não encontrado');
+    return;
+  }
 
-      if (resultado.sucesso) {
-        Alert.alert('Sucesso', 'Endereço cadastrado com sucesso!');
-        onEnderecoCadastrado(resultado.endereco_id);
-        limparFormulario();
-        onClose();
-      } else {
-        Alert.alert('Erro', resultado.erro || 'Erro ao cadastrar endereço');
-      }
-    } catch (error) {
-      console.error('Erro ao salvar endereço:', error);
-      Alert.alert('Erro', 'Erro ao conectar com o servidor');
+  if (!token) {
+    Alert.alert('Erro', 'Token de autenticação não encontrado');
+    return;
+  }
+
+  try {
+    const dadosEndereco = {
+      cliente_id: clienteId,
+      cep: novoEndereco.cep.replace(/\D/g, ''),
+      logradouro: novoEndereco.logradouro,
+      numero: novoEndereco.numero,
+      complemento: novoEndereco.complemento,
+      bairro: novoEndereco.bairro,
+      cidade: novoEndereco.cidade,
+      estado: novoEndereco.estado,
+      principal: novoEndereco.principal
+    };
+
+    console.log('Dados enviados para API:', dadosEndereco);
+
+    const resultado = await cadastrarEndereco(dadosEndereco, token);
+
+    console.log('Resposta da API:', resultado);
+
+    if (resultado.sucesso) {
+      Alert.alert('Sucesso', 'Endereço cadastrado com sucesso!');
+      onEnderecoCadastrado(resultado.endereco_id);
+      limparFormulario();
+      onClose();
+    } else {
+      Alert.alert('Erro', resultado.erro || 'Erro ao cadastrar endereço');
     }
+  } catch (error) {
+    console.error('Erro completo:', error);
+    Alert.alert('Erro', 'Erro ao conectar com o servidor');
+  }
   };
-
   const limparFormulario = () => {
     setNovoEndereco({
       cep: '',
@@ -211,7 +270,12 @@ export default function ModalEndereco({
                   maxLength={9}
                   erro={errosEndereco.cep}
                   iconeDireita={carregandoCEP ? "refresh" : "search"}
-                  onIconPress={() => buscarCEP(novoEndereco.cep.replace(/\D/g, ''))}
+                  onIconPress={() => {
+                    const cepNumerico = novoEndereco.cep.replace(/\D/g, '');
+                    if (cepNumerico.length === 8) {
+                      buscarCEP(cepNumerico);
+                    }
+                  }}
                 />
               </View>
 
