@@ -6,7 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  Alert
+  Alert,
+  Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
@@ -108,11 +109,20 @@ const MenuPerfil = ({ visible, onClose, navigation }) => {
                   onClose();
                 }}
               />
-             <MenuItem
+              <MenuItem
                 icon="globe-outline"
                 title="Versão Web"
                 onPress={() => {
-                  Alert.alert('Versão Web', 'Acesse: chamaservico.tds104-senac.online');
+                  // Abre o link diretamente
+                  const url = 'https://chamaservico.tds104-senac.online';
+                  if (Platform.OS === 'web') {
+                    window.open(url, '_blank');
+                  } else {
+                    // Para mobile, usa Linking
+                    import('react-native').then(({ Linking }) => {
+                      Linking.openURL(url);
+                    });
+                  }
                   onClose();
                 }}
               />

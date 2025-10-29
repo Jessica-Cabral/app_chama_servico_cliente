@@ -1,9 +1,11 @@
-// App.js - VERSÃO CORRIGIDA
+// App.js - VERSÃO CORRIGIDA COM HEADER PADRONIZADO
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useContext } from 'react';
 import { AuthProvider, AuthContext } from './src/context/AuthContext';
+import { Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import HomeScreen from './src/screens/HomeScreen';
 import Login from './src/screens/Login';
@@ -13,21 +15,35 @@ import MinhasSolicitacoes from './src/screens/MinhasSolicitacoes';
 import NovaSolicitacao from './src/screens/NovaSolicitacao';
 import PerfilCliente from './src/screens/PerfilCliente';
 import PropostasRecebidas from './src/screens/PropostasRecebidas';
-import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// Stack para Solicitações (inclui MinhasSolicitacoes e NovaSolicitacao)
+// Componente personalizado para o header "Chama Serviço"
+const ChamaServicoHeader = () => (
+  <View style={{ alignItems: 'center' }}>
+    <Text style={{
+      color: '#f5a522',
+      fontSize: 20,
+      fontWeight: 'bold',
+    }}>
+      Chama Serviço
+    </Text>
+  </View>
+);
+
+// Configurações padrão do header para telas autenticadas
+const authenticatedHeaderOptions = {
+  headerStyle: { backgroundColor: '#0a112e' },
+  headerTintColor: '#fff',
+  headerTitleAlign: 'center',
+  headerTitle: () => <ChamaServicoHeader />,
+};
+
+// Stack para Solicitações
 function SolicitacoesStack() {
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: '#0a112e' },
-        headerTintColor: '#fff',
-        headerTitleAlign: 'center',
-      }}
-    >
+    <Stack.Navigator screenOptions={authenticatedHeaderOptions}>
       <Stack.Screen
         name="MinhasSolicitacoes"
         component={MinhasSolicitacoes}
@@ -36,7 +52,6 @@ function SolicitacoesStack() {
       <Stack.Screen
         name="NovaSolicitacao"
         component={NovaSolicitacao}
-        options={{ title: 'Nova Solicitação' }}
       />
     </Stack.Navigator>
   );
@@ -45,22 +60,14 @@ function SolicitacoesStack() {
 // Stack para Dashboard
 function DashStack() {
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: '#0a112e' },
-        headerTintColor: '#fff',
-        headerTitleAlign: 'center',
-      }}
-    >
+    <Stack.Navigator screenOptions={authenticatedHeaderOptions}>
       <Stack.Screen
         name="DashboardCliente"
         component={DashboardCliente}
-        options={{ title: 'Dashboard Cliente' }}
       />
       <Stack.Screen
         name="PerfilCliente"
         component={PerfilCliente}
-        options={{ title: 'Perfil do Cliente' }}
       />
     </Stack.Navigator>
   );
@@ -69,59 +76,120 @@ function DashStack() {
 // Stack para Propostas
 function PropostasStack() {
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: '#0a112e' },
-        headerTintColor: '#fff',
-        headerTitleAlign: 'center',
-      }}
-    >
+    <Stack.Navigator screenOptions={authenticatedHeaderOptions}>
       <Stack.Screen
         name="PropostasRecebidas"
         component={PropostasRecebidas}
-        options={{ title: 'Propostas Recebidas' }}
       />
     </Stack.Navigator>
   );
 }
 
-// Rotas principais com abas - VERSÃO CORRIGIDA
-function MainRoutes() {
+// Stack principal que inclui todas as telas autenticadas
+function MainStack() {
+  return (
+    <Stack.Navigator screenOptions={authenticatedHeaderOptions}>
+      <Stack.Screen
+        name="MainTabs"
+        component={MainTabs}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="NovaSolicitacao"
+        component={NovaSolicitacao}
+      />
+      <Stack.Screen
+        name="PerfilCliente"
+        component={PerfilCliente}
+      />
+    </Stack.Navigator>
+  );
+}
+
+// Componente de abas principal
+function MainTabs() {
   return (
     <Tab.Navigator
       initialRouteName="Dashboard"
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
+        tabBarIcon: ({ color, size, focused }) => {
           let iconName;
 
           if (route.name === 'Dashboard') {
-            iconName = 'home';
+            iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Solicitações') {
-            iconName = 'document-text-outline';
+            iconName = focused ? 'document-text' : 'document-text-outline';
           } else if (route.name === 'Propostas') {
-            iconName = 'cash-outline';
+            iconName = focused ? 'cash' : 'cash-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#1976D2',
+        tabBarActiveTintColor: '#f5a522',
         tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {
+          backgroundColor: '#f8f9fa',
+          borderTopWidth: 1,
+          borderTopColor: '#e0e0e0',
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+        },
+        ...authenticatedHeaderOptions, // Aplica o header padrão em todas as abas
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashStack} options={{ headerShown: false }} />
-      <Tab.Screen name="Solicitações" component={SolicitacoesStack} options={{ headerShown: false }} />
-      <Tab.Screen name="Propostas" component={PropostasStack} options={{ headerShown: false }} />
+      <Tab.Screen 
+        name="Dashboard" 
+        component={DashboardCliente}
+        options={{
+          title: 'Início',
+        }}
+      />
+      <Tab.Screen 
+        name="Solicitações" 
+        component={SolicitacoesStack}
+        options={{ 
+          headerShown: false,
+          title: 'Solicitações'
+        }}
+      />
+      <Tab.Screen 
+        name="Propostas" 
+        component={PropostasStack}
+        options={{ 
+          headerShown: false,
+          title: 'Propostas'
+        }}
+      />
     </Tab.Navigator>
   );
 }
 
-// Rotas de autenticação (sem abas)
+// Rotas de autenticação (sem header "Chama Serviço")
 function AuthRoutes() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator 
+      screenOptions={{ 
+        headerShown: false,
+        animation: 'fade',
+      }}
+    >
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
+      {/* Adicionar NovaSolicitacao também nas rotas de auth para evitar erro de navegação */}
+      <Stack.Screen 
+        name="NovaSolicitacao" 
+        component={NovaSolicitacao} 
+        options={{ 
+          headerShown: true,
+          title: 'Nova Solicitação',
+          headerStyle: { backgroundColor: '#0a112e' },
+          headerTintColor: '#fff',
+          headerTitleAlign: 'center',
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -132,7 +200,7 @@ function Rotas() {
 
   if (carregando) return null;
 
-  return usuario ? <MainRoutes /> : <AuthRoutes />;
+  return usuario ? <MainStack /> : <AuthRoutes />;
 }
 
 export default function App() {

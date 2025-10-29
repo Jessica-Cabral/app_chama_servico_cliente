@@ -9,10 +9,12 @@ import {
   ScrollView,
   Alert,
   Modal,
-  RefreshControl
+  RefreshControl,
+  
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
 const MinhasSolicitacoes = ({ navigation }) => {
   const { usuario, token } = useContext(AuthContext);
@@ -515,7 +517,7 @@ const podeEditarExcluir = (solicitacao) => {
   return (
     <View style={styles.container}>
       {/* Header com botão de nova solicitação */}
-      <View style={styles.header}>
+      <LinearGradient colors={["#283579", "#0a112e"]} style={styles.header}>
         <Text style={styles.titulo}>Minhas Solicitações</Text>
         <View style={styles.headerAcoes}>
           <TouchableOpacity 
@@ -531,7 +533,7 @@ const podeEditarExcluir = (solicitacao) => {
             <Ionicons name="add" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
 
       <ScrollView 
         style={styles.content}

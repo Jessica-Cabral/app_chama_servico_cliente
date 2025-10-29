@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   containerPrincipal: {
     alignItems: "center",
     marginVertical: 10, // espaçamento acima e abaixo
-    marginTop:80,
+    marginTop:280,
   },
   titulo: {
     fontSize: 32,

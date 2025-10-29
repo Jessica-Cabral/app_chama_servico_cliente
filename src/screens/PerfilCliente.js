@@ -8,7 +8,8 @@ import {
   Alert,
   Modal,
   TextInput,
-  RefreshControl
+  RefreshControl,
+  ActivityIndicator
 } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,7 +19,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { 
   consultarPerfil, 
   atualizarPerfil, 
-  alterarSenha 
+  alterarSenha,
+  masks,
+  validators,
+  formatarDataParaExibicao 
 } from '../services/perfil';
 import { 
   listarEnderecos, 
@@ -38,6 +42,7 @@ const PerfilCliente = ({ navigation }) => {
   const [modalEditarPerfil, setModalEditarPerfil] = useState(false);
   const [modalAlterarSenha, setModalAlterarSenha] = useState(false);
   const [modalEnderecoVisible, setModalEnderecoVisible] = useState(false);
+  const [carregandoPrincipal, setCarregandoPrincipal] = useState(false);
 
   // Estados para edição do perfil
   const [nome, setNome] = useState('');
@@ -45,6 +50,7 @@ const PerfilCliente = ({ navigation }) => {
   const [telefone, setTelefone] = useState('');
   const [cpf, setCpf] = useState('');
   const [dtNascimento, setDtNascimento] = useState('');
+  const [erros, setErros] = useState({});
 
   // Estados para alteração de senha
   const [senhaAtual, setSenhaAtual] = useState('');
@@ -68,12 +74,21 @@ const PerfilCliente = ({ navigation }) => {
       } else {
         setPerfil(perfilData);
         
-        // Preencher dados para edição
+        // Preencher dados para edição com máscaras
         setNome(perfilData.nome || '');
         setEmail(perfilData.email || '');
-        setTelefone(perfilData.telefone || '');
-        setCpf(perfilData.cpf || '');
-        setDtNascimento(perfilData.dt_nascimento || '');
+        
+        // Formatar telefone para exibição
+        const telefoneFormatado = perfilData.telefone ? masks.telefone(perfilData.telefone) : '';
+        setTelefone(telefoneFormatado);
+        
+        // Formatar CPF para exibição
+        const cpfFormatado = perfilData.cpf ? masks.cpf(perfilData.cpf) : '';
+        setCpf(cpfFormatado);
+        
+        // Formatar data para exibição (DD/MM/YYYY)
+        const dataFormatada = perfilData.dt_nascimento ? formatarDataParaExibicao(perfilData.dt_nascimento) : '';
+        setDtNascimento(dataFormatada);
       }
 
       // Carregar endereços
@@ -99,9 +114,111 @@ const PerfilCliente = ({ navigation }) => {
 
   const handleEditarPerfil = () => {
     setModalEditarPerfil(true);
+    setErros({});
+  };
+
+  const handleInputChange = (campo, valor) => {
+    let valorFormatado = valor;
+
+    // Aplicar máscaras em tempo real
+    switch (campo) {
+      case 'telefone':
+        valorFormatado = masks.telefone(valor);
+        setTelefone(valorFormatado);
+        break;
+      case 'cpf':
+        // Só permite editar CPF se não foi preenchido anteriormente
+        if (!perfil?.cpf) {
+          valorFormatado = masks.cpf(valor);
+          setCpf(valorFormatado);
+        }
+        break;
+      case 'dtNascimento':
+        // Só permite editar data se não foi preenchida anteriormente
+        if (!perfil?.dt_nascimento) {
+          valorFormatado = masks.data(valor);
+          setDtNascimento(valorFormatado);
+        }
+        break;
+      case 'nome':
+        setNome(valor);
+        break;
+      case 'email':
+        setEmail(valor);
+        break;
+    }
+
+    // Limpar erro do campo
+    if (erros[campo]) {
+      setErros(prev => ({
+        ...prev,
+        [campo]: ''
+      }));
+    }
+  };
+
+  const validarFormulario = () => {
+    const novosErros = {};
+
+    if (!nome.trim()) {
+      novosErros.nome = 'Nome é obrigatório';
+    }
+
+    if (!email.trim()) {
+      novosErros.email = 'Email é obrigatório';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      novosErros.email = 'Email inválido';
+    }
+
+    // Validar CPF apenas se estiver preenchido e não foi preenchido anteriormente
+    if (cpf && !perfil?.cpf) {
+      const cpfLimpo = cpf.replace(/\D/g, '');
+      if (cpfLimpo.length > 0 && !validators.cpf(cpfLimpo)) {
+        novosErros.cpf = 'CPF inválido';
+      }
+    }
+
+    // Validar data apenas se estiver preenchida e não foi preenchida anteriormente
+    if (dtNascimento && !perfil?.dt_nascimento) {
+      if (!validators.data(dtNascimento)) {
+        novosErros.dtNascimento = 'Data de nascimento inválida';
+      }
+    }
+
+    setErros(novosErros);
+    return Object.keys(novosErros).length === 0;
   };
 
   const salvarPerfil = async () => {
+    // Validar campos obrigatórios
+    if (!nome.trim() || !email.trim()) {
+      Alert.alert('Erro', 'Nome e email são obrigatórios');
+      return;
+    }
+
+    // Validar email
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      Alert.alert('Erro', 'Email inválido');
+      return;
+    }
+
+    // Validar CPF se estiver preenchido e não foi preenchido anteriormente
+    if (cpf && cpf.replace(/\D/g, '').length > 0 && !perfil?.cpf) {
+      const cpfLimpo = cpf.replace(/\D/g, '');
+      if (cpfLimpo.length !== 11 || !validators.cpf(cpfLimpo)) {
+        Alert.alert('Erro', 'CPF inválido');
+        return;
+      }
+    }
+
+    // Validar data se estiver preenchida e não foi preenchida anteriormente
+    if (dtNascimento && dtNascimento.length > 0 && !perfil?.dt_nascimento) {
+      if (!validators.data(dtNascimento)) {
+        Alert.alert('Erro', 'Data de nascimento inválida');
+        return;
+      }
+    }
+
     try {
       const result = await atualizarPerfil(
         usuario.id,
@@ -119,8 +236,13 @@ const PerfilCliente = ({ navigation }) => {
         Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
         setModalEditarPerfil(false);
         carregarPerfil();
-        // Atualizar contexto global
-        atualizarUsuario({ ...usuario, nome, email, telefone });
+        
+        // Atualizar contexto global (com verificação de segurança)
+        if (typeof atualizarUsuario === 'function') {
+          atualizarUsuario({ ...usuario, nome, email, telefone });
+        } else {
+          console.warn('atualizarUsuario não está disponível no contexto');
+        }
       }
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error);
@@ -128,6 +250,19 @@ const PerfilCliente = ({ navigation }) => {
     }
   };
 
+  // Função para formatar CPF para exibição
+  const formatarCpfParaExibicao = (cpf) => {
+    if (!cpf) return '';
+    return masks.cpf(cpf);
+  };
+
+  // Função para formatar telefone para exibição
+  const formatarTelefoneParaExibicao = (telefone) => {
+    if (!telefone) return '';
+    return masks.telefone(telefone);
+  };
+
+  // Resto das funções permanecem iguais...
   const handleAlterarSenha = () => {
     setModalAlterarSenha(true);
   };
@@ -167,23 +302,28 @@ const PerfilCliente = ({ navigation }) => {
   };
 
   const handleDefinirPrincipal = async (enderecoId) => {
+    setCarregandoPrincipal(true);
     try {
-      const result = await definirEnderecoPrincipal(usuario.id, enderecoId, token);
-      
-      if (result.erro) {
-        Alert.alert('Erro', result.erro || 'Erro ao definir endereço principal');
-      } else {
-        Alert.alert('Sucesso', 'Endereço definido como principal!');
+      const response = await definirEnderecoPrincipal(
+        usuario.id,
+        enderecoId,
+        token
+      );
+      if (response.sucesso) {
+        Alert.alert("Sucesso", "Endereço definido como principal");
         carregarPerfil();
+      } else {
+        Alert.alert("Erro", response.erro || "Não foi possível atualizar");
       }
     } catch (error) {
-      console.error('Erro ao definir endereço principal:', error);
-      Alert.alert('Erro', 'Erro ao conectar com o servidor');
+      Alert.alert("Erro", "Erro ao definir endereço principal");
+    } finally {
+      setCarregandoPrincipal(false);
     }
   };
 
   const handleExcluirEndereco = (endereco) => {
-    const enderecoPrincipal = enderecos.find(e => e.principal === 1);
+    const enderecoPrincipal = enderecos.find(e => e.principal === 1 || e.principal === "1");
     if (enderecoPrincipal && enderecoPrincipal.id === endereco.id) {
       Alert.alert('Aviso', 'Não é possível excluir o endereço principal');
       return;
@@ -223,17 +363,8 @@ const PerfilCliente = ({ navigation }) => {
     setModalEnderecoVisible(true);
   };
 
-  // const handleEnderecoCadastrado = () => {
-  //   carregarPerfil();
-  // };
-
-  //para teste
-
   const handleEnderecoCadastrado = () => {
-    console.log('Modal fechado, recarregando endereços...');
-    console.log('Usuario ID:', usuario?.id);
-    console.log('Token presente:', !!token);
-    carregarDados();
+    carregarPerfil();
   };
 
   const handleLogout = () => {
@@ -249,16 +380,6 @@ const PerfilCliente = ({ navigation }) => {
         }
       ]
     );
-  };
-
-  const formatarData = (data) => {
-    if (!data) return '';
-    // Converte de YYYY-MM-DD para DD/MM/YYYY
-    const partes = data.split('-');
-    if (partes.length === 3) {
-      return `${partes[2]}/${partes[1]}/${partes[0]}`;
-    }
-    return data;
   };
 
   if (carregando && !refreshing) {
@@ -319,20 +440,30 @@ const PerfilCliente = ({ navigation }) => {
             <View style={styles.infoItem}>
               <Ionicons name="call-outline" size={16} color="#4e5264" />
               <Text style={styles.infoLabel}>Telefone:</Text>
-              <Text style={styles.infoValor}>{perfil?.telefone || 'Não informado'}</Text>
+              <Text style={styles.infoValor}>
+                {perfil?.telefone ? formatarTelefoneParaExibicao(perfil.telefone) : 'Não informado'}
+              </Text>
             </View>
 
             <View style={styles.infoItem}>
               <Ionicons name="card-outline" size={16} color="#4e5264" />
               <Text style={styles.infoLabel}>CPF:</Text>
-              <Text style={styles.infoValor}>{perfil?.cpf || 'Não informado'}</Text>
+              <Text style={styles.infoValor}>
+                {perfil?.cpf ? formatarCpfParaExibicao(perfil.cpf) : 'Não informado'}
+                {perfil?.cpf && (
+                  <Text style={styles.campoBloqueado}> (Não editável)</Text>
+                )}
+              </Text>
             </View>
 
             <View style={styles.infoItem}>
               <Ionicons name="calendar-outline" size={16} color="#4e5264" />
               <Text style={styles.infoLabel}>Data Nasc.:</Text>
               <Text style={styles.infoValor}>
-                {perfil?.dt_nascimento ? formatarData(perfil.dt_nascimento) : 'Não informada'}
+                {perfil?.dt_nascimento ? formatarDataParaExibicao(perfil.dt_nascimento) : 'Não informada'}
+                {perfil?.dt_nascimento && (
+                  <Text style={styles.campoBloqueado}> (Não editável)</Text>
+                )}
               </Text>
             </View>
           </View>
@@ -368,26 +499,37 @@ const PerfilCliente = ({ navigation }) => {
               <View key={endereco.id} style={styles.card}>
                 <View style={styles.enderecoHeader}>
                   <View style={styles.enderecoTitulo}>
-                    {endereco.principal === 1 && (
-                      <View style={styles.principalBadge}>
-                        <Ionicons name="star" size={12} color="#fff" />
-                        <Text style={styles.principalTexto}>Principal</Text>
-                      </View>
-                    )}
+                    <Text> {endereco.principal === "1" && (
+                        <View style={styles.principalBadge}>
+                          <Ionicons name="star" size={12} color="#fff" />
+                          <Text style={styles.principalTexto}>Principal</Text>
+                        </View>
+                      )}
+                    </Text> 
                     <Text style={styles.enderecoNome}>
                       {endereco.logradouro}, {endereco.numero}
                     </Text>
                   </View>
                   
                   <View style={styles.enderecoAcoes}>
-                    {endereco.principal !== 1 && (
-                      <TouchableOpacity 
-                        style={styles.acaoBtn}
-                        onPress={() => handleDefinirPrincipal(endereco.id)}
-                      >
-                        <Ionicons name="star-outline" size={16} color="#f5a522" />
-                      </TouchableOpacity>
-                    )}
+                    <Text>
+                        {endereco.principal !== "1" && (
+                          <TouchableOpacity 
+                            style={styles.acaoBtn}
+                            onPress={() => handleDefinirPrincipal(endereco.id)}
+                            disabled={carregandoPrincipal}
+                          >
+                            {carregandoPrincipal ? (
+                              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <ActivityIndicator size="small" color="#f5a522" />
+                                <Text style={{ marginLeft: 8, color: '#f5a522' }}>Carregando...</Text>
+                              </View>
+                            ) : (
+                              <Ionicons name="star-outline" size={16} color="#f5a522" />
+                            )}
+                          </TouchableOpacity>
+                       )}
+                    </Text>
                     <TouchableOpacity 
                       style={styles.acaoBtn}
                       onPress={() => handleExcluirEndereco(endereco)}
@@ -398,10 +540,8 @@ const PerfilCliente = ({ navigation }) => {
                 </View>
 
                 <View style={styles.enderecoInfo}>
-                  {endereco.complemento && (
-                    <Text style={styles.enderecoTexto}>Complemento: {endereco.complemento}</Text>
-                  )}
                   <Text style={styles.enderecoTexto}>Bairro: {endereco.bairro}</Text>
+                  <Text style={styles.enderecoTexto}>Complemento: {endereco.complemento}</Text>
                   <Text style={styles.enderecoTexto}>CEP: {endereco.cep}</Text>
                   <Text style={styles.enderecoTexto}>
                     {endereco.cidade} - {endereco.estado}
@@ -442,23 +582,25 @@ const PerfilCliente = ({ navigation }) => {
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Nome *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, erros.nome && styles.inputError]}
                   value={nome}
-                  onChangeText={setNome}
+                  onChangeText={(text) => handleInputChange('nome', text)}
                   placeholder="Digite seu nome"
                 />
+                {erros.nome && <Text style={styles.erroTexto}>{erros.nome}</Text>}
               </View>
 
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Email *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, erros.email && styles.inputError]}
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={(text) => handleInputChange('email', text)}
                   placeholder="Digite seu email"
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
+                {erros.email && <Text style={styles.erroTexto}>{erros.email}</Text>}
               </View>
 
               <View style={styles.inputGroup}>
@@ -466,40 +608,50 @@ const PerfilCliente = ({ navigation }) => {
                 <TextInput
                   style={styles.input}
                   value={telefone}
-                  onChangeText={setTelefone}
-                  placeholder="Digite seu telefone"
+                  onChangeText={(text) => handleInputChange('telefone', text)}
+                  placeholder="(00) 00000-0000"
                   keyboardType="phone-pad"
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>CPF {perfil?.cpf ? '(Não editável)' : '*'}</Text>
+                <Text style={styles.inputLabel}>CPF {perfil?.cpf ? '(Não editável)' : ''}</Text>
                 <TextInput
-                  style={[styles.input, perfil?.cpf && styles.inputDisabled]}
+                  style={[
+                    styles.input, 
+                    (perfil?.cpf && styles.inputDisabled),
+                    erros.cpf && styles.inputError
+                  ]}
                   value={cpf}
-                  onChangeText={(text) => {
-                    if (!perfil?.cpf) {
-                      setCpf(text);
-                    }
-                  }}
-                  placeholder="Digite seu CPF"
+                  onChangeText={(text) => handleInputChange('cpf', text)}
+                  placeholder="000.000.000-00"
+                  keyboardType="numeric"
                   editable={!perfil?.cpf}
                 />
+                {erros.cpf && <Text style={styles.erroTexto}>{erros.cpf}</Text>}
+                {perfil?.cpf && (
+                  <Text style={styles.infoTexto}>CPF não pode ser alterado após o cadastro</Text>
+                )}
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Data Nasc. {perfil?.dt_nascimento ? '(Não editável)' : '*'}</Text>
+                <Text style={styles.inputLabel}>Data Nasc. {perfil?.dt_nascimento ? '(Não editável)' : ''}</Text>
                 <TextInput
-                  style={[styles.input, perfil?.dt_nascimento && styles.inputDisabled]}
+                  style={[
+                    styles.input, 
+                    (perfil?.dt_nascimento && styles.inputDisabled),
+                    erros.dtNascimento && styles.inputError
+                  ]}
                   value={dtNascimento}
-                  onChangeText={(text) => {
-                    if (!perfil?.dt_nascimento) {
-                      setDtNascimento(text);
-                    }
-                  }}
+                  onChangeText={(text) => handleInputChange('dtNascimento', text)}
                   placeholder="DD/MM/AAAA"
+                  keyboardType="numeric"
                   editable={!perfil?.dt_nascimento}
                 />
+                {erros.dtNascimento && <Text style={styles.erroTexto}>{erros.dtNascimento}</Text>}
+                {perfil?.dt_nascimento && (
+                  <Text style={styles.infoTexto}>Data de nascimento não pode ser alterada após o cadastro</Text>
+                )}
               </View>
 
               <TouchableOpacity style={styles.salvarBtn} onPress={salvarPerfil}>
@@ -568,27 +720,19 @@ const PerfilCliente = ({ navigation }) => {
         </View>
       </Modal>
 
-      {/* Modal: Adicionar Endereço (Componente Separado) */}
-      <ModalEndereco
-        visible={modalEnderecoVisible}
-        onClose={() => setModalEnderecoVisible(false)}
-        usuarioId={usuario?.id}
-        token={token}
-        onEnderecoCadastrado={handleEnderecoCadastrado}
-      />
-
-      //para teste
-      {/* <ModalEndereco
-        visible={modalEnderecoVisivel}
-        onClose={() => setModalEnderecoVisivel(false)}
-        clienteId={usuario?.id}
-        token={token}
-        onEnderecoCadastrado={handleEnderecoCadastrado}
-      /> */}
+      {/* Modal: Adicionar Endereço */}
+        <ModalEndereco
+          visible={modalEnderecoVisible}
+          onClose={() => setModalEnderecoVisible(false)}
+          clienteId={usuario?.id}  // Mude de usuarioId para clienteId
+          token={token}
+          onEnderecoCadastrado={handleEnderecoCadastrado}
+        />
     </View>
   );
 };
 
+// Os styles permanecem os mesmos...
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -652,6 +796,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#0a112e",
     flex: 1,
+  },
+  campoBloqueado: {
+    fontSize: 12,
+    color: "#6c757d",
+    fontStyle: 'italic',
   },
   alterarSenhaBtn: {
     flexDirection: 'row',
@@ -815,6 +964,20 @@ const styles = StyleSheet.create({
   inputDisabled: {
     backgroundColor: '#e9ecef',
     color: '#6c757d',
+  },
+  inputError: {
+    borderColor: '#dc3545',
+  },
+  erroTexto: {
+    color: '#dc3545',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  infoTexto: {
+    color: '#6c757d',
+    fontSize: 12,
+    marginTop: 4,
+    fontStyle: 'italic',
   },
   salvarBtn: {
     backgroundColor: "#283579",

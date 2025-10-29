@@ -16,6 +16,7 @@ import { AuthContext } from "../context/AuthContext";
 import Botao from '../components/Botao';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as PropostasService from '../services/propostas';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 const ModalRecusa = ({ 
@@ -581,12 +582,12 @@ const PropostasRecebidas = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <LinearGradient colors={["#283579", "#0a112e"]} style={styles.header}>
         <Text style={styles.titulo}>Propostas Recebidas</Text>
         <Text style={styles.subtitulo}>
           Gerencie as propostas que você recebeu para suas solicitações
         </Text>
-      </View>
+      </LinearGradient>
 
       {/* Filtros */}
       <View style={styles.filtrosContainer}>
@@ -690,12 +691,12 @@ const styles = StyleSheet.create({
   titulo: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#283579',
+    color: '#FFF',
     marginBottom: 4,
   },
   subtitulo: {
     fontSize: 14,
-    color: '#6c757d',
+    color: '#f2f5f7ff',
   },
   filtrosContainer: {
     flexDirection: 'row',

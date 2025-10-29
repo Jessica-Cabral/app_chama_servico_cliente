@@ -15,6 +15,7 @@ import Botao from '../components/Botao';
 import CardSolicitacao from '../components/CardSolicitacao';
 import MenuPerfil from '../components/menuPerfil';
 import { carregarDadosDashboard } from '../services/dashboard';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const DashboardCliente = ({ navigation }) => {
   const { usuario, token, logout } = useContext(AuthContext);
@@ -140,7 +141,7 @@ const carregarDados = async () => {
   return (
     <View style={styles.container}>
       {/* Header com Avatar Clicável */}
-      <View style={styles.header}>
+      <LinearGradient colors={["#283579", "#0a112e"]} style={styles.header}>
         <View style={styles.headerContent}>
           <TouchableOpacity 
             style={styles.perfilButton}
@@ -173,7 +174,7 @@ const carregarDados = async () => {
             <Ionicons name="notifications-outline" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
 
       <ScrollView
         style={styles.content}
