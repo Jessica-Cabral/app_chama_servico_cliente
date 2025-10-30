@@ -1,8 +1,10 @@
- import React from "react";
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
+  Linking,
+  TouchableOpacity,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,25 +12,40 @@ import Botao from "../components/Botao";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const HomeScreen = ({ navigation }) => {
+  const abrirWeb = () => {
+    Linking.openURL("https://chamaservico.tds104-senac.online/");
+  };
+
   return (
     <LinearGradient colors={["#0a112e", "#283579"]} style={styles.container}>
-      <SafeAreaProvider style={styles.safeArea}>
-        <View style={styles.containerBotaoEntrar}>
-          <Botao
-            title="Entrar"
-            onPress={() => navigation.navigate("Login")}
-            style={styles.botaoEntrar}
-          />
+      <View style={styles.containerBotaoEntrar}>
+        <Botao
+          title="Entrar"
+          onPress={() => navigation.navigate("Login")}
+          style={styles.botaoEntrar}
+        />
+      </View>
+      <View style={styles.cabecalhoChama}>
+        <View style={styles.logoLinha}>
+          <Text style={styles.textoLogo}>CHAMA</Text>
+          <Text style={styles.textoLogoServico}>SERVIÇO</Text>
         </View>
-
-
         <View style={styles.containerPrincipal}>
           <Text style={styles.titulo}>
             Conectamos você aos melhores prestadores de serviços
           </Text>
         </View>
-
+      </View>
+      <SafeAreaProvider style={styles.safeArea}>
         <View style={styles.containerCartoes}>
+          <TouchableOpacity style={styles.cartaoPerfil} onPress={abrirWeb}>
+            <View style={styles.iconeContainer}>
+              <Ionicons name="globe-outline" size={48} color="#f5a522" />
+            </View>
+            <Text style={styles.tituloCartao}>
+              Acesse a versão web para mais detalhes
+            </Text>
+          </TouchableOpacity>
           <View style={styles.cartaoPerfil}>
             <View style={styles.iconeContainer}>
               <Ionicons name="search" size={48} color="#f5a522" />
@@ -49,12 +66,16 @@ const HomeScreen = ({ navigation }) => {
             </View>
             <Text style={styles.tituloCartao}>Gerencie Suas Solicitações</Text>
           </View>
-          <View style={styles.cartaoPerfil}>
+
+          {/* <View style={styles.cartaoPerfil}>
             <View style={styles.iconeContainer}>
               <Ionicons name="star" size={48} color="#f5a522" />
             </View>
             <Text style={styles.tituloCartao}>Avaliações e Reputação</Text>
-          </View>
+          </View> */}
+
+          {/* Novo Card para acessar a versão web */}
+          
         </View>
 
         <View style={styles.containerBotoes}>
@@ -72,107 +93,55 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: 0,
+    justifyContent: "center",
   },
   safeArea: {
     flex: 1,
+    justifyContent: "center",
   },
-  cabecalho: {
-    padding: 16,
+  cabecalhoChama: {
     alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+    paddingTop:60,
+    //marginBottom: 10,
+    marginTop: 50,
   },
-  logoContainer: {
+  logoLinha: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 32,
     gap: 8,
   },
-  logoTexto: {
-    fontSize: 24,
-
+  textoLogo: {
+    fontSize: 32,
     color: "#FFF",
+    fontWeight: "bold",
   },
-  conteudo: {
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 24,
+  textoLogoServico: {
+    fontSize: 32,
+    color: "#f5a522",
+    fontWeight: "bold",
+    marginLeft: 8,
   },
   containerPrincipal: {
     alignItems: "center",
-    marginVertical: 10, // espaçamento acima e abaixo
-    marginTop:280,
+    marginVertical: 10,
+    //marginTop: 10,
   },
   titulo: {
-    fontSize: 32,
-
+    fontSize: 24,
     color: "#FFF",
     textAlign: "center",
-    marginBottom: 24,
-  },
-  subtitulo: {
-    fontSize: 16,
-    color: "#FFF",
-    textAlign: "center",
-    opacity: 0.9,
-    lineHeight: 24,
-  },
-  containerCaracteristicas: {
-    gap: 24,
-  },
-  caracteristica: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-  },
-  textoCaracteristica: {
-    fontSize: 16,
-    color: "#283579",
-  },
-  containerBotoes: {
-    paddingHorizontal: 24,
-    paddingVertical: 32, // espaçamento interno acima e abaixo
-    gap: 16,
-  },
-  containerBotaoEntrar: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-    zIndex: 10,
-  },
-  botaoEntrar: {
-    backgroundColor: "#f5a522",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  botoes: {
-    borderColor: "#FFF",
-    color: "#FFF",
-  },
-  rodape: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-    gap: 8 / 2,
-  },
-  textoRodape: {
-    color: "#FFF",
-    fontSize: 14,
-    opacity: 0.8,
-  },
-  linkRodape: {
-    color: "#FFF",
-    fontSize: 14,
-
-    textDecorationLine: "none",
+    marginBottom: 16,
   },
   containerCartoes: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    rowGap: 20,
-    marginVertical: 32, // espaçamento acima e abaixo
+    paddingHorizontal: 10,
+    rowGap: 16,
+    marginVertical: 24,
   },
   cartaoPerfil: {
     backgroundColor: "#fff",
@@ -186,6 +155,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
+    marginBottom: 10,
   },
   iconeContainer: {
     width: 80,
@@ -201,7 +171,29 @@ const styles = StyleSheet.create({
     color: "#283579",
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 24,
+    marginBottom: 8,
+  },
+  containerBotaoEntrar: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 10,
+    marginTop: 40,
+  },
+  botaoEntrar: {
+    backgroundColor: "#f5a522",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  containerBotoes: {
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    gap: 16,
+  },
+  botoes: {
+    borderColor: "#FFF",
+    color: "#FFF",
   },
 });
 

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Chama Servico",
-    "slug": "Chama Servico",
+    "slug": "app_chamaservico_cliente",
     "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

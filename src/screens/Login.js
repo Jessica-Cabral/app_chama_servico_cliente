@@ -15,11 +15,10 @@ import { Ionicons } from "@expo/vector-icons";
 import Botao from "../components/Botao";
 import InputCampo from "../components/InputCampo";
 
-
 const Login = ({ navigation }) => {
   //acessa o login do contexto
-  const {login} = useContext(AuthContext)
-  // parâmentros 
+  const { login } = useContext(AuthContext);
+  // parâmentros
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
@@ -33,12 +32,12 @@ const Login = ({ navigation }) => {
 
     if (resultado.sucesso) {
       // salva  no contexto e inclui token
-      await login ({ ...resultado.usuario, token: resultado.token}); 
-      navigation.replace("DashboardCliente");
+      await login({ ...resultado.usuario, token: resultado.token });
+      navigation.replace("MainTabs");
     } else {
       Alert.alert("Erro", resultado.erro || "Erro ao realizar login.");
     }
-   };
+  };
 
   return (
     <LinearGradient colors={["#0a112e", "#283579"]} style={styles.container}>
@@ -66,7 +65,9 @@ const Login = ({ navigation }) => {
                 onChangeText={setEmail}
                 placeholder="Digite seu e-mail"
                 secureTextEntry={false}
-                icone={<Ionicons name="mail-outline" size={20} color="#283579" />}
+                icone={
+                  <Ionicons name="mail-outline" size={20} color="#283579" />
+                }
               />
 
               <InputCampo
@@ -75,12 +76,22 @@ const Login = ({ navigation }) => {
                 onChangeText={setSenha}
                 placeholder="Digite sua senha"
                 secureTextEntry={true}
-                icone={<Ionicons name="lock-closed-outline" size={20} color="#283579" />}
+                icone={
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color="#283579"
+                  />
+                }
               />
 
-              <TouchableOpacity style={styles.linkEsqueceuSenha} 
-                onPress={() => navigation.navigate("")}>
-                <Text style={styles.textoEsqueceuSenha}>Esqueceu sua senha?</Text>
+              <TouchableOpacity
+                style={styles.linkEsqueceuSenha}
+                onPress={() => navigation.navigate("")}
+              >
+                <Text style={styles.textoEsqueceuSenha}>
+                  Esqueceu sua senha?
+                </Text>
               </TouchableOpacity>
 
               <Botao
@@ -92,8 +103,19 @@ const Login = ({ navigation }) => {
 
               <View style={styles.containerCadastro}>
                 <Text style={styles.textoCadastro}>Não tem uma conta?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate("CadastroCliente")}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("CadastroCliente")}
+                >
                   <Text style={styles.linkCadastro}>Cadastre-se aqui</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.containerVoltar}>
+                <TouchableOpacity
+                  style={styles.botaoVoltar}
+                  onPress={() => navigation.navigate("HomeScreen")}
+                >
+                  <Ionicons name="arrow-back" size={16} color="#f5a522" />
+                  <Text style={styles.textoVoltar}>Voltar para a Home</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -105,7 +127,7 @@ const Login = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
+  container: {
     flex: 1,
   },
   keyboardContainer: {
@@ -138,20 +160,19 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   containerFormulario: {
-
     justifyContent: "center",
     paddingHorizontal: 24,
   },
   titulo: {
     fontSize: 24,
     color: "#0a112e",
-    fontWeight: 'bold',
+    fontWeight: "bold",
     textAlign: "center",
     marginBottom: 8,
   },
   subtitulo: {
     fontSize: 16,
-    color: '#4e5264',
+    color: "#4e5264",
     textAlign: "center",
     opacity: 0.9,
     marginBottom: 32,
@@ -179,7 +200,7 @@ const styles = StyleSheet.create({
   },
   botaoLogin: {
     marginBottom: 24,
-    color:"#fff"
+    color: "#fff",
   },
   containerCadastro: {
     flexDirection: "row",
@@ -195,6 +216,22 @@ const styles = StyleSheet.create({
     color: "#f5a522",
     fontSize: 14,
   },
+  containerVoltar: {
+      marginTop: 16,
+      alignItems: 'center',
+    },
+    botaoVoltar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+    },
+    textoVoltar: {
+      color: "#283579",
+      fontSize: 14,
+      fontWeight: '500',
+    },
 });
 
 export default Login;

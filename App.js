@@ -175,7 +175,7 @@ function AuthRoutes() {
         animation: 'fade',
       }}
     >
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
       {/* Adicionar NovaSolicitacao também nas rotas de auth para evitar erro de navegação */}
