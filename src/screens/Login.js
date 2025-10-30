@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   TouchableOpacity,
   Alert,
+  Linking,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,6 +22,12 @@ const Login = ({ navigation }) => {
   // parâmentros
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+
+  //link para acessar página de reset de senha via web
+   const abrirWeb = () => {
+      Linking.openURL("https://chamaservico.tds104-senac.online/redefinir-senha");
+    };
+  
 
   const manipularLogin = async () => {
     if (!email || !senha) {
@@ -87,7 +94,7 @@ const Login = ({ navigation }) => {
 
               <TouchableOpacity
                 style={styles.linkEsqueceuSenha}
-                onPress={() => navigation.navigate("")}
+                onPress={() => abrirWeb()}
               >
                 <Text style={styles.textoEsqueceuSenha}>
                   Esqueceu sua senha?
