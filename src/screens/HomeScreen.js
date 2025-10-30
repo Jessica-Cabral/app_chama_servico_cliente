@@ -5,11 +5,15 @@ import {
   StyleSheet,
   Linking,
   TouchableOpacity,
+  ScrollView,
+  Dimensions
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import Botao from "../components/Botao";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const { height: screenHeight } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
   const abrirWeb = () => {
@@ -18,74 +22,75 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <LinearGradient colors={["#0a112e", "#283579"]} style={styles.container}>
-      <View style={styles.containerBotaoEntrar}>
-        <Botao
-          title="Entrar"
-          onPress={() => navigation.navigate("Login")}
-          style={styles.botaoEntrar}
-        />
-      </View>
-      <View style={styles.cabecalhoChama}>
-        <View style={styles.logoLinha}>
-          <Text style={styles.textoLogo}>CHAMA</Text>
-          <Text style={styles.textoLogoServico}>SERVIÇO</Text>
-        </View>
-        <View style={styles.containerPrincipal}>
-          <Text style={styles.titulo}>
-            Conectamos você aos melhores prestadores de serviços
-          </Text>
-        </View>
-      </View>
-      <SafeAreaProvider style={styles.safeArea}>
-        <View style={styles.containerCartoes}>
-          <TouchableOpacity style={styles.cartaoPerfil} onPress={abrirWeb}>
-            <View style={styles.iconeContainer}>
-              <Ionicons name="globe-outline" size={48} color="#f5a522" />
+      <SafeAreaView style={styles.safeArea}>
+        {/* Conteúdo Principal com Scroll */}
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Cabeçalho */}
+          <View style={styles.cabecalhoChama}>
+            <View style={styles.logoLinha}>
+              <Text style={styles.textoLogo}>CHAMA</Text>
+              <Text style={styles.textoLogoServico}>SERVIÇO</Text>
             </View>
-            <Text style={styles.tituloCartao}>
-              Acesse a versão web para mais detalhes
-            </Text>
-          </TouchableOpacity>
-          <View style={styles.cartaoPerfil}>
-            <View style={styles.iconeContainer}>
-              <Ionicons name="search" size={48} color="#f5a522" />
+            <View style={styles.containerPrincipal}>
+              <Text style={styles.titulo}>
+                Conectamos você aos melhores prestadores de serviços
+              </Text>
             </View>
-            <Text style={styles.tituloCartao}>Encontre profissionais</Text>
           </View>
 
-          <View style={styles.cartaoPerfil}>
-            <View style={styles.iconeContainer}>
-              <Ionicons name="construct" size={48} color="#f5a522" />
+          {/* Cards de Serviços */}
+          <View style={styles.containerCartoes}>
+            <TouchableOpacity style={styles.cartaoPerfil} onPress={abrirWeb}>
+              <View style={styles.iconeContainer}>
+                <Ionicons name="globe-outline" size={48} color="#f5a522" />
+              </View>
+              <Text style={styles.tituloCartao}>
+                Acesse a versão web para mais detalhes
+              </Text>
+            </TouchableOpacity>
+            
+            <View style={styles.cartaoPerfil}>
+              <View style={styles.iconeContainer}>
+                <Ionicons name="search" size={48} color="#f5a522" />
+              </View>
+              <Text style={styles.tituloCartao}>Encontre profissionais</Text>
             </View>
-            <Text style={styles.tituloCartao}>Solicite Serviços</Text>
+
+            <View style={styles.cartaoPerfil}>
+              <View style={styles.iconeContainer}>
+                <Ionicons name="construct" size={48} color="#f5a522" />
+              </View>
+              <Text style={styles.tituloCartao}>Solicite Serviços</Text>
+            </View>
+
+            <View style={styles.cartaoPerfil}>
+              <View style={styles.iconeContainer}>
+                <Ionicons name="list-circle" size={48} color="#f5a522" />
+              </View>
+              <Text style={styles.tituloCartao}>Gerencie Suas Solicitações</Text>
+            </View>
           </View>
+        </ScrollView>
 
-          <View style={styles.cartaoPerfil}>
-            <View style={styles.iconeContainer}>
-              <Ionicons name="list-circle" size={48} color="#f5a522" />
-            </View>
-            <Text style={styles.tituloCartao}>Gerencie Suas Solicitações</Text>
-          </View>
-
-          {/* <View style={styles.cartaoPerfil}>
-            <View style={styles.iconeContainer}>
-              <Ionicons name="star" size={48} color="#f5a522" />
-            </View>
-            <Text style={styles.tituloCartao}>Avaliações e Reputação</Text>
-          </View> */}
-
-          {/* Novo Card para acessar a versão web */}
-          
-        </View>
-
+        {/* Container Fixo para os Botões na Parte Inferior */}
         <View style={styles.containerBotoes}>
+          <Botao
+            title="Entrar"
+            onPress={() => navigation.navigate("Login")}
+            style={styles.botaoEntrar}
+            styleTexto={styles.textoBotaoEntrar}
+          />
           <Botao
             title="Quero me cadastrar"
             onPress={() => navigation.navigate("CadastroCliente")}
-            style={styles.botoes}
+            style={styles.botaoCadastrar}
+            styleTexto={styles.textoBotaoCadastrar}
           />
         </View>
-      </SafeAreaProvider>
+      </SafeAreaView>
     </LinearGradient>
   );
 };
@@ -93,25 +98,26 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 0,
-    justifyContent: "center",
   },
   safeArea: {
     flex: 1,
-    justifyContent: "center",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 140, // Espaço extra para os botões
   },
   cabecalhoChama: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 24,
-    paddingTop:60,
-    //marginBottom: 10,
-    marginTop: 50,
+    paddingHorizontal: 24,
+    paddingTop: screenHeight * 0.12, // 12% da altura da tela
+    paddingBottom: screenHeight * 0.05, // 5% da altura da tela
   },
   logoLinha: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    marginBottom: 20,
   },
   textoLogo: {
     fontSize: 32,
@@ -126,22 +132,21 @@ const styles = StyleSheet.create({
   },
   containerPrincipal: {
     alignItems: "center",
-    marginVertical: 10,
-    //marginTop: 10,
   },
   titulo: {
-    fontSize: 24,
+    fontSize: 22,
     color: "#FFF",
     textAlign: "center",
-    marginBottom: 16,
+    lineHeight: 28,
   },
   containerCartoes: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     rowGap: 16,
-    marginVertical: 24,
+    marginBottom: 20,
   },
   cartaoPerfil: {
     backgroundColor: "#fff",
@@ -149,51 +154,59 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: "center",
     width: "47%",
-    height: 180,
+    height: screenHeight * 0.22, // 22% da altura da tela
+    minHeight: 160, // Altura mínima para telas muito pequenas
     shadowColor: "#0a112e",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
-    marginBottom: 10,
+    justifyContent: "center",
   },
   iconeContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     backgroundColor: "#f5f5f5",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 12,
   },
   tituloCartao: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#283579",
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 8,
+    lineHeight: 18,
   },
-  containerBotaoEntrar: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-    zIndex: 10,
-    marginTop: 40,
+  containerBotoes: {
+    paddingHorizontal: 20,
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 5,
   },
   botaoEntrar: {
     backgroundColor: "#f5a522",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginBottom: 12,
   },
-  containerBotoes: {
-    paddingHorizontal: 24,
-    paddingVertical: 32,
-    gap: 16,
+  textoBotaoEntrar: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
-  botoes: {
+  botaoCadastrar: {
+    backgroundColor: "transparent",
+    borderWidth: 2,
     borderColor: "#FFF",
+    paddingVertical: 14,
+    borderRadius: 10,
+  },
+  textoBotaoCadastrar: {
     color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
