@@ -10,11 +10,13 @@ import {
   Alert,
   Modal,
   RefreshControl,
-  
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+
+//atualizar quando focar
+//import { useFocusEffect } from '@react-navigation/native';
 
 const MinhasSolicitacoes = ({ navigation }) => {
   const { usuario, token } = useContext(AuthContext);
@@ -30,12 +32,19 @@ const MinhasSolicitacoes = ({ navigation }) => {
 
   useEffect(() => {
     buscarSolicitacoes();
-    
+
     // Atualizar a cada 30 segundos para status
     const intervalo = setInterval(buscarSolicitacoes, 30000);
-    
+
     return () => clearInterval(intervalo);
   }, [usuario, token]);
+
+  //Testado para atualizar a lista ao voltar da edição
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     buscarSolicitacoes();
+  //   }, [])
+  // );
 
   const buscarSolicitacoes = async () => {
     try {
@@ -70,22 +79,25 @@ const MinhasSolicitacoes = ({ navigation }) => {
     buscarSolicitacoes();
   }, []);
 
-// Verificar se pode editar/excluir - APENAS status "Aguardando proposta"
-const podeEditarExcluir = (solicitacao) => {
-  // Verifica por status_id (se disponível) ou por string do status
-  const status = solicitacao.status?.toLowerCase() || solicitacao.status_nome?.toLowerCase() || '';
-  
-  // Status que permitem edição/exclusão
-  const statusPermitidos = [
-    'aguardando', 
-    'aguardando propostas', 
-    'pendente', 
-    'em análise',
-    '1' // status_id = 1
-  ];
-  
-  return statusPermitidos.some(perm => status.includes(perm));
-};
+  // Verificar se pode editar/excluir - APENAS status "Aguardando proposta"
+  const podeEditarExcluir = (solicitacao) => {
+    // Verifica por status_id (se disponível) ou por string do status
+    const status =
+      solicitacao.status?.toLowerCase() ||
+      solicitacao.status_nome?.toLowerCase() ||
+      "";
+
+    // Status que permitem edição/exclusão
+    const statusPermitidos = [
+      "aguardando",
+      "aguardando propostas",
+      "pendente",
+      "em análise",
+      "1", // status_id = 1
+    ];
+
+    return statusPermitidos.some((perm) => status.includes(perm));
+  };
 
   const statusOpcoes = [
     { label: "Todos", value: "todos" },
@@ -96,35 +108,51 @@ const podeEditarExcluir = (solicitacao) => {
   ];
 
   const obterStatusInfo = (status) => {
-    const statusLower = status?.toLowerCase() || 'aguardando';
+    const statusLower = status?.toLowerCase() || "aguardando";
     switch (statusLower) {
-      case 'aguardando':
-      case 'pendente':
-      case 'em análise':
-        return { label: "Aguardando Propostas", cor: "#f5a522", icone: "time-outline" };
-      case 'andamento':
-      case 'em_andamento':
-      case 'em andamento':
+      case "aguardando":
+      case "pendente":
+      case "em análise":
+        return {
+          label: "Aguardando Propostas",
+          cor: "#f5a522",
+          icone: "time-outline",
+        };
+      case "andamento":
+      case "em_andamento":
+      case "em andamento":
         return { label: "Em Andamento", cor: "#007bff", icone: "sync-outline" };
-      case 'concluido':
-      case 'concluído':
-        return { label: "Concluído", cor: "#28a745", icone: "checkmark-circle-outline" };
-      case 'cancelado':
-        return { label: "Cancelado", cor: "#dc3545", icone: "close-circle-outline" };
+      case "concluido":
+      case "concluído":
+        return {
+          label: "Concluído",
+          cor: "#28a745",
+          icone: "checkmark-circle-outline",
+        };
+      case "cancelado":
+        return {
+          label: "Cancelado",
+          cor: "#dc3545",
+          icone: "close-circle-outline",
+        };
       default:
-        return { label: status || "Aguardando", cor: "#6c757d", icone: "help-circle-outline" };
+        return {
+          label: status || "Aguardando",
+          cor: "#6c757d",
+          icone: "help-circle-outline",
+        };
     }
   };
 
   const obterUrgenciaInfo = (urgencia) => {
-    const urgenciaLower = urgencia?.toLowerCase() || 'media';
+    const urgenciaLower = urgencia?.toLowerCase() || "media";
     switch (urgenciaLower) {
-      case 'alta':
+      case "alta":
         return { label: "Alta", cor: "#dc3545", icone: "alert-circle" };
-      case 'media':
-      case 'média':
+      case "media":
+      case "média":
         return { label: "Média", cor: "#f5a522", icone: "time" };
-      case 'baixa':
+      case "baixa":
         return { label: "Baixa", cor: "#28a745", icone: "checkmark-circle" };
       default:
         return { label: "Média", cor: "#6c757d", icone: "help-circle" };
@@ -136,22 +164,25 @@ const podeEditarExcluir = (solicitacao) => {
 
     // Filtro por status - CORREÇÃO
     if (filtroStatus !== "todos") {
-      filtradas = filtradas.filter(s => {
-        const status = s.status?.toLowerCase() || s.status_nome?.toLowerCase() || '';
+      filtradas = filtradas.filter((s) => {
+        const status =
+          s.status?.toLowerCase() || s.status_nome?.toLowerCase() || "";
         const filtro = filtroStatus.toLowerCase();
-        
+
         // Mapeamento de filtros para status reais
         const mapeamento = {
-          'aguardando': ['aguardando', 'pendente', 'em análise'],
-          'andamento': ['andamento', 'em andamento', 'em_andamento'],
-          'concluido': ['concluido', 'concluído'],
-          'cancelado': ['cancelado']
+          aguardando: ["aguardando", "pendente", "em análise"],
+          andamento: ["andamento", "em andamento", "em_andamento"],
+          concluido: ["concluido", "concluído"],
+          cancelado: ["cancelado"],
         };
-        
+
         if (mapeamento[filtro]) {
-          return mapeamento[filtro].some(statusPermitido => status.includes(statusPermitido));
+          return mapeamento[filtro].some((statusPermitido) =>
+            status.includes(statusPermitido)
+          );
         }
-        
+
         return status.includes(filtro);
       });
     }
@@ -168,19 +199,19 @@ const podeEditarExcluir = (solicitacao) => {
     }
 
     return filtradas;
-  }; 
+  };
 
   const formatarData = (dataString) => {
     if (!dataString) return "Data não informada";
-    
+
     try {
       const data = new Date(dataString);
-      return data.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      return data.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       });
     } catch {
       return dataString;
@@ -189,10 +220,11 @@ const podeEditarExcluir = (solicitacao) => {
 
   const formatarMoeda = (valor) => {
     if (!valor) return "R$ 0,00";
-    const valorNumerico = typeof valor === 'string' ? parseFloat(valor.replace(',', '.')) : valor;
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    const valorNumerico =
+      typeof valor === "string" ? parseFloat(valor.replace(",", ".")) : valor;
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(valorNumerico);
   };
 
@@ -204,21 +236,19 @@ const podeEditarExcluir = (solicitacao) => {
   const handleEditar = (solicitacao) => {
     if (podeEditarExcluir(solicitacao)) {
       // Navega para a aba "Solicitações" que tem acesso à NovaSolicitacao
-     navigation.navigate('NovaSolicitacao', { 
-      solicitacao: solicitacao 
-    });
+      navigation.navigate("NovaSolicitacao", {
+        solicitacao: solicitacao,
+      });
     } else {
       Alert.alert(
         "Edição não permitida",
+        "Esta solicitação não pode ser editada pois já recebeu propostas."
       );
     }
   };
 
   const handleNovaSolicitacao = () => {
-    // Navega para a aba "Solicitações" que tem acesso à NovaSolicitacao
-    navigation.navigate('Solicitações', { 
-      screen: 'NovaSolicitacao'
-    });
+    navigation.navigate("NovaSolicitacao", {});
   };
 
   const handleExcluir = (solicitacao) => {
@@ -235,11 +265,11 @@ const podeEditarExcluir = (solicitacao) => {
       `Tem certeza que deseja excluir a solicitação "${solicitacao.titulo}"?`,
       [
         { text: "Cancelar", style: "cancel" },
-        { 
-          text: "Excluir", 
+        {
+          text: "Excluir",
           style: "destructive",
-          onPress: () => excluirSolicitacao(solicitacao.id)
-        }
+          onPress: () => excluirSolicitacao(solicitacao.id),
+        },
       ]
     );
   };
@@ -256,15 +286,15 @@ const podeEditarExcluir = (solicitacao) => {
           },
           body: JSON.stringify({
             cliente_id: usuario.id,
-            solicitacao_id: solicitacaoId
-          })
+            solicitacao_id: solicitacaoId,
+          }),
         }
       );
-      
+
       const data = await response.json();
-      
+
       if (data.sucesso) {
-        setSolicitacoes(prev => prev.filter(s => s.id !== solicitacaoId));
+        setSolicitacoes((prev) => prev.filter((s) => s.id !== solicitacaoId));
         Alert.alert("Sucesso", "Solicitação excluída com sucesso!");
       } else {
         Alert.alert("Erro", data.erro || "Erro ao excluir solicitação");
@@ -277,9 +307,9 @@ const podeEditarExcluir = (solicitacao) => {
 
   const handleVerPropostas = (solicitacao) => {
     // Verifica se a tela de Propostas existe antes de navegar
-    if (navigation && typeof navigation.navigate === 'function') {
-      navigation.navigate('Propostas', { 
-        filtroSolicitacao: solicitacao.id 
+    if (navigation && typeof navigation.navigate === "function") {
+      navigation.navigate("Propostas", {
+        filtroSolicitacao: solicitacao.id,
       });
     } else {
       Alert.alert("Aviso", "Funcionalidade de propostas não disponível");
@@ -290,7 +320,6 @@ const podeEditarExcluir = (solicitacao) => {
     buscarSolicitacoes();
     Alert.alert("Sucesso", "Lista atualizada!");
   };
-
 
   // Modal de Detalhes
   const ModalDetalhes = () => (
@@ -304,7 +333,7 @@ const podeEditarExcluir = (solicitacao) => {
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitulo}>Detalhes da Solicitação</Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setModalDetalhesVisivel(false)}
               style={styles.modalFecharBtn}
             >
@@ -316,70 +345,136 @@ const podeEditarExcluir = (solicitacao) => {
             <ScrollView style={styles.modalBody}>
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Título:</Text>
-                <Text style={styles.detalheValor}>{solicitacaoSelecionada.titulo}</Text>
+                <Text style={styles.detalheValor}>
+                  {solicitacaoSelecionada.titulo}
+                </Text>
               </View>
-              
+
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Descrição:</Text>
-                <Text style={styles.detalheValor}>{solicitacaoSelecionada.descricao}</Text>
+                <Text style={styles.detalheValor}>
+                  {solicitacaoSelecionada.descricao}
+                </Text>
               </View>
-              
+
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Tipo de Serviço:</Text>
                 <Text style={styles.detalheValor}>
-                  {solicitacaoSelecionada.tipo_servico || solicitacaoSelecionada.tipo_servico_nome || "Não informado"}
+                  {solicitacaoSelecionada.tipo_servico ||
+                    solicitacaoSelecionada.tipo_servico_nome ||
+                    "Não informado"}
                 </Text>
               </View>
-              
+
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Endereço:</Text>
                 <Text style={styles.detalheValor}>
-                  {solicitacaoSelecionada.endereco || 
-                   `${solicitacaoSelecionada.logradouro || ''} ${solicitacaoSelecionada.numero || ''}, ${solicitacaoSelecionada.bairro || ''}`.trim() || 
-                   "Não informado"}
+                  {solicitacaoSelecionada.endereco ||
+                    `${solicitacaoSelecionada.logradouro || ""} ${
+                      solicitacaoSelecionada.numero || ""
+                    }, ${solicitacaoSelecionada.bairro || ""}`.trim() ||
+                    "Não informado"}
                 </Text>
               </View>
-              
+
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Data de Criação:</Text>
                 <Text style={styles.detalheValor}>
-                  {formatarData(solicitacaoSelecionada.data_criacao || solicitacaoSelecionada.data_solicitacao)}
+                  {formatarData(
+                    solicitacaoSelecionada.data_criacao ||
+                      solicitacaoSelecionada.data_solicitacao
+                  )}
                 </Text>
               </View>
-              
+              <View style={styles.detalheItem}>
+                <Text style={styles.detalheLabel}>Data do Atendimento:</Text>
+                <Text style={styles.detalheValor}>
+                  {formatarData(
+                    solicitacaoSelecionada.data_atendimento ||
+                      solicitacaoSelecionada.data_atendimento
+                  )}
+                </Text>
+              </View>
+
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Status:</Text>
                 <View style={styles.statusContainer}>
-                  <View style={[styles.statusBadge, { backgroundColor: obterStatusInfo(solicitacaoSelecionada.status || solicitacaoSelecionada.status_nome).cor }]}>
-                    <Ionicons name={obterStatusInfo(solicitacaoSelecionada.status || solicitacaoSelecionada.status_nome).icone} size={14} color="#fff" />
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      {
+                        backgroundColor: obterStatusInfo(
+                          solicitacaoSelecionada.status ||
+                            solicitacaoSelecionada.status_nome
+                        ).cor,
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name={
+                        obterStatusInfo(
+                          solicitacaoSelecionada.status ||
+                            solicitacaoSelecionada.status_nome
+                        ).icone
+                      }
+                      size={14}
+                      color="#fff"
+                    />
                     <Text style={styles.statusText}>
-                      {obterStatusInfo(solicitacaoSelecionada.status || solicitacaoSelecionada.status_nome).label}
+                      {
+                        obterStatusInfo(
+                          solicitacaoSelecionada.status ||
+                            solicitacaoSelecionada.status_nome
+                        ).label
+                      }
                     </Text>
                   </View>
                 </View>
               </View>
-              
+
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Urgência:</Text>
                 <View style={styles.statusContainer}>
                   <View style={styles.urgenciaBadge}>
-                    <Ionicons name={obterUrgenciaInfo(solicitacaoSelecionada.urgencia).icone} size={14} color={obterUrgenciaInfo(solicitacaoSelecionada.urgencia).cor} />
-                    <Text style={[styles.urgenciaTexto, { color: obterUrgenciaInfo(solicitacaoSelecionada.urgencia).cor }]}>
+                    <Ionicons
+                      name={
+                        obterUrgenciaInfo(solicitacaoSelecionada.urgencia).icone
+                      }
+                      size={14}
+                      color={
+                        obterUrgenciaInfo(solicitacaoSelecionada.urgencia).cor
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.urgenciaTexto,
+                        {
+                          color: obterUrgenciaInfo(
+                            solicitacaoSelecionada.urgencia
+                          ).cor,
+                        },
+                      ]}
+                    >
                       {obterUrgenciaInfo(solicitacaoSelecionada.urgencia).label}
                     </Text>
                   </View>
                 </View>
               </View>
-              
+
               <View style={styles.detalheItem}>
                 <Text style={styles.detalheLabel}>Propostas Recebidas:</Text>
-                <Text style={styles.detalheValor}>{solicitacaoSelecionada.total_propostas || 0}</Text>
+                <Text style={styles.detalheValor}>
+                  {solicitacaoSelecionada.total_propostas || 0}
+                </Text>
               </View>
-              
-              {(solicitacaoSelecionada.orcamento_estimado > 0 || solicitacaoSelecionada.orcamento_estimado) && (
+
+              {(solicitacaoSelecionada.orcamento_estimado > 0 ||
+                solicitacaoSelecionada.orcamento_estimado) && (
                 <View style={styles.detalheItem}>
                   <Text style={styles.detalheLabel}>Orçamento Estimado:</Text>
-                  <Text style={styles.detalheValor}>{formatarMoeda(solicitacaoSelecionada.orcamento_estimado)}</Text>
+                  <Text style={styles.detalheValor}>
+                    {formatarMoeda(solicitacaoSelecionada.orcamento_estimado)}
+                  </Text>
                 </View>
               )}
             </ScrollView>
@@ -399,9 +494,15 @@ const podeEditarExcluir = (solicitacao) => {
         {/* Cabeçalho com data e status */}
         <View style={styles.cardHeader}>
           <Text style={styles.cardData}>
-            {formatarData(item.data_criacao || item.data_atendimento || item.data_solicitacao)}
+            {formatarData(
+              item.data_criacao ||
+                item.data_atendimento ||
+                item.data_solicitacao
+            )}
           </Text>
-          <View style={[styles.statusBadge, { backgroundColor: statusInfo.cor }]}>
+          <View
+            style={[styles.statusBadge, { backgroundColor: statusInfo.cor }]}
+          >
             <Ionicons name={statusInfo.icone} size={14} color="#fff" />
             <Text style={styles.statusText}>{statusInfo.label}</Text>
           </View>
@@ -413,39 +514,46 @@ const podeEditarExcluir = (solicitacao) => {
           <Text style={styles.cardDescricao} numberOfLines={2}>
             {item.descricao}
           </Text>
-          
+
           <View style={styles.detalhesRow}>
             <View style={styles.detalheItem}>
               <Ionicons name="business-outline" size={16} color="#4e5264" />
-              <Text style={styles.detalheTexto}>{item.tipo_servico || item.tipo_servico_nome || "Serviço"}</Text>
+              <Text style={styles.detalheTexto}>
+                {item.tipo_servico || item.tipo_servico_nome || "Serviço"}
+              </Text>
             </View>
-            
+
             <View style={styles.detalheItem}>
-              <Ionicons name={urgenciaInfo.icone} size={16} color={urgenciaInfo.cor} />
+              <Ionicons
+                name={urgenciaInfo.icone}
+                size={16}
+                color={urgenciaInfo.cor}
+              />
               <Text style={[styles.detalheTexto, { color: urgenciaInfo.cor }]}>
                 {urgenciaInfo.label}
               </Text>
             </View>
           </View>
+          {(item.orcamento_estimado > 0 || item.orcamento_estimado) && (
+            <View style={styles.detalheItem}>
+              <Ionicons name="cash-outline" size={16} color="#4e5264" />
+              <Text style={styles.detalheTexto}>
+                {formatarMoeda(item.orcamento_estimado)}
+              </Text>
+            </View>
+          )}
 
           <View style={styles.detalhesRow}>
             <View style={styles.detalheItem}>
               <Ionicons name="location-outline" size={16} color="#4e5264" />
               <Text style={styles.detalheTexto}>
-                {item.endereco || 
-                 `${item.logradouro || ''} ${item.numero || ''}, ${item.bairro || ''}`.trim() || 
-                 "Asa Sul, DF"}
+                {item.endereco ||
+                  `${item.logradouro || ""} ${item.numero || ""}, ${
+                    item.bairro || ""
+                  }`.trim() ||
+                  "Asa Sul, DF"}
               </Text>
             </View>
-            
-            {(item.orcamento_estimado > 0 || item.orcamento_estimado) && (
-              <View style={styles.detalheItem}>
-                <Ionicons name="cash-outline" size={16} color="#4e5264" />
-                <Text style={styles.detalheTexto}>
-                  {formatarMoeda(item.orcamento_estimado)}
-                </Text>
-              </View>
-            )}
           </View>
 
           {/* Informação de propostas */}
@@ -459,7 +567,7 @@ const podeEditarExcluir = (solicitacao) => {
 
         {/* Ações - Botões condicionais */}
         <View style={styles.cardAcoes}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.acaoBtn}
             onPress={() => handleVerDetalhes(item)}
           >
@@ -469,7 +577,7 @@ const podeEditarExcluir = (solicitacao) => {
 
           {/* Botão Editar - APENAS se status for "Aguardando proposta" */}
           {podeEditar && (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.acaoBtn}
               onPress={() => handleEditar(item)}
             >
@@ -480,7 +588,7 @@ const podeEditarExcluir = (solicitacao) => {
 
           {/* Botão Excluir - APENAS se status for "Aguardando proposta" */}
           {podeEditar && (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.acaoBtn}
               onPress={() => handleExcluir(item)}
             >
@@ -491,7 +599,7 @@ const podeEditarExcluir = (solicitacao) => {
         </View>
 
         {/* Botão Ver Propostas */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.propostasBtn}
           onPress={() => handleVerPropostas(item)}
         >
@@ -520,13 +628,13 @@ const podeEditarExcluir = (solicitacao) => {
       <LinearGradient colors={["#283579", "#0a112e"]} style={styles.header}>
         <Text style={styles.titulo}>Minhas Solicitações</Text>
         <View style={styles.headerAcoes}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.atualizarBtn}
             onPress={handleAtualizar}
           >
             <Ionicons name="refresh" size={20} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.novoBtn}
             onPress={handleNovaSolicitacao}
           >
@@ -535,7 +643,7 @@ const podeEditarExcluir = (solicitacao) => {
         </View>
       </LinearGradient>
 
-      <ScrollView 
+      <ScrollView
         style={styles.content}
         refreshControl={
           <RefreshControl
@@ -549,7 +657,7 @@ const podeEditarExcluir = (solicitacao) => {
         {/* Filtros */}
         <View style={styles.filtrosContainer}>
           <Text style={styles.filtrosTitulo}>Filtros</Text>
-          
+
           {/* Campo de busca */}
           <View style={styles.buscaContainer}>
             <Ionicons name="search-outline" size={20} color="#4e5264" />
@@ -564,7 +672,11 @@ const podeEditarExcluir = (solicitacao) => {
 
           {/* Filtro de status */}
           <Text style={styles.filtroLabel}>Status:</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtrosScroll}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.filtrosScroll}
+          >
             {statusOpcoes.map((opcao) => (
               <TouchableOpacity
                 key={opcao.value}
@@ -597,11 +709,13 @@ const podeEditarExcluir = (solicitacao) => {
                 : "Nenhuma solicitação encontrada para este filtro."}
             </Text>
             {solicitacoes.length === 0 && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.novaSolicitacaoBtn}
                 onPress={handleNovaSolicitacao}
               >
-                <Text style={styles.novaSolicitacaoTexto}>Criar Primeira Solicitação</Text>
+                <Text style={styles.novaSolicitacaoTexto}>
+                  Criar Primeira Solicitação
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -632,9 +746,9 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 20,
     paddingHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   titulo: {
     fontSize: 24,
@@ -642,8 +756,8 @@ const styles = StyleSheet.create({
     color: "#ffffff",
   },
   headerAcoes: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   atualizarBtn: {
@@ -870,29 +984,29 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 0,
-    width: '90%',
-    maxHeight: '80%',
+    width: "90%",
+    maxHeight: "80%",
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: "#e9ecef",
   },
   modalTitulo: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#0a112e',
+    fontWeight: "bold",
+    color: "#0a112e",
   },
   modalFecharBtn: {
     padding: 4,
@@ -905,25 +1019,25 @@ const styles = StyleSheet.create({
   },
   detalheLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#4e5264',
+    fontWeight: "600",
+    color: "#4e5264",
     marginBottom: 4,
   },
   detalheValor: {
     fontSize: 16,
-    color: '#0a112e',
+    color: "#0a112e",
   },
   statusContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   urgenciaBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   urgenciaTexto: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });
 

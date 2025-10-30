@@ -117,7 +117,7 @@ function MainTabs() {
 
           if (route.name === 'Dashboard') {
             iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'Solicitações') {
+          } else if (route.name === 'Solicitacoes') {
             iconName = focused ? 'document-text' : 'document-text-outline';
           } else if (route.name === 'Propostas') {
             iconName = focused ? 'cash' : 'cash-outline';
@@ -147,7 +147,7 @@ function MainTabs() {
         }}
       />
       <Tab.Screen 
-        name="Solicitações" 
+        name="Solicitacoes" 
         component={SolicitacoesStack}
         options={{ 
           headerShown: false,
@@ -179,7 +179,7 @@ function AuthRoutes() {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
       {/* Adicionar NovaSolicitacao também nas rotas de auth para evitar erro de navegação */}
-      <Stack.Screen 
+      {/* <Stack.Screen 
         name="NovaSolicitacao" 
         component={NovaSolicitacao} 
         options={{ 
@@ -189,7 +189,7 @@ function AuthRoutes() {
           headerTintColor: '#fff',
           headerTitleAlign: 'center',
         }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 }

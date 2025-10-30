@@ -1,5 +1,5 @@
-import { useContext, useState, useEffect } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { useContext, useState, useEffect } from "react";
+import { AuthContext } from "../context/AuthContext";
 import {
   View,
   Text,
@@ -7,32 +7,32 @@ import {
   Image,
   Alert,
   StyleSheet,
-  TouchableOpacity
-} from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+  TouchableOpacity,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 
-import InputCampo from '../components/InputCampo';
-import SelectCampo from '../components/SelectCampo';
-import RadioGrupo from '../components/RadioGrupo';
-import Botao from '../components/Botao';
-import SecaoFormulario from '../components/SecaoFormulario';
-import ModalEndereco from '../components/ModalEndereco';
+import InputCampo from "../components/InputCampo";
+import SelectCampo from "../components/SelectCampo";
+import RadioGrupo from "../components/RadioGrupo";
+import Botao from "../components/Botao";
+import SecaoFormulario from "../components/SecaoFormulario";
+import ModalEndereco from "../components/ModalEndereco";
 
-import { listarTiposServicos } from '../services/tiposServicos';
-import { listarEnderecos } from '../services/enderecos';
+import { listarTiposServicos } from "../services/tiposServicos";
+import { listarEnderecos } from "../services/enderecos";
 import {
   criarSolicitacao,
   atualizarSolicitacao,
   enviarImagemSolicitacao,
-  buscarSolicitacaoPorId
-} from '../services/solicitacoes';
+  buscarSolicitacaoPorId,
+} from "../services/solicitacoes";
 
 export default function NovaSolicitacao({ route, navigation }) {
   const { token, usuario } = useContext(AuthContext);
-  
+
   if (!usuario) {
     return <Text>Usuário não autenticado</Text>;
   }
@@ -42,12 +42,16 @@ export default function NovaSolicitacao({ route, navigation }) {
 
   const [tiposServicos, setTiposServicos] = useState([]);
   const [enderecos, setEnderecos] = useState([]);
-  const [tipoServicoId, setTipoServicoId] = useState(solicitacao?.tipo_servico_id ?? '');
-  const [enderecoId, setEnderecoId] = useState(solicitacao?.endereco_id ?? '');
-  const [titulo, setTitulo] = useState(solicitacao?.titulo ?? '');
-  const [descricao, setDescricao] = useState(solicitacao?.descricao ?? '');
-  const [orcamento, setOrcamento] = useState(solicitacao?.orcamento_estimado?.toString() ?? '');
-  const [urgencia, setUrgencia] = useState(solicitacao?.urgencia ?? 'media');
+  const [tipoServicoId, setTipoServicoId] = useState(
+    solicitacao?.tipo_servico_id ?? ""
+  );
+  const [enderecoId, setEnderecoId] = useState(solicitacao?.endereco_id ?? "");
+  const [titulo, setTitulo] = useState(solicitacao?.titulo ?? "");
+  const [descricao, setDescricao] = useState(solicitacao?.descricao ?? "");
+  const [orcamento, setOrcamento] = useState(
+    solicitacao?.orcamento_estimado?.toString() ?? ""
+  );
+  const [urgencia, setUrgencia] = useState(solicitacao?.urgencia ?? "media");
   const [imagens, setImagens] = useState([]);
   const [imagensExistentes, setImagensExistentes] = useState([]);
   const [resumo, setResumo] = useState(null);
@@ -57,7 +61,9 @@ export default function NovaSolicitacao({ route, navigation }) {
 
   // Estados para data/hora
   const [dataAtendimento, setDataAtendimento] = useState(
-    solicitacao?.data_atendimento ? new Date(solicitacao.data_atendimento) : new Date()
+    solicitacao?.data_atendimento
+      ? new Date(solicitacao.data_atendimento)
+      : new Date()
   );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -74,14 +80,14 @@ export default function NovaSolicitacao({ route, navigation }) {
         }
 
         await carregarEnderecos();
-        
+
         // Se estiver editando, carregar imagens existentes
         if (solicitacao?.id) {
           await carregarImagensSolicitacao();
         }
       } catch (error) {
-        console.error('Erro ao carregar dados:', error);
-        Alert.alert('Erro', 'Não foi possível carregar os dados necessários');
+        console.error("Erro ao carregar dados:", error);
+        Alert.alert("Erro", "Não foi possível carregar os dados necessários");
       }
     }
     carregarDados();
@@ -89,21 +95,21 @@ export default function NovaSolicitacao({ route, navigation }) {
 
   const carregarImagensSolicitacao = async () => {
     if (!solicitacao?.id) return;
-    
+
     try {
       setCarregandoImagens(true);
       const resultado = await buscarSolicitacaoPorId(solicitacao.id, token);
-      
+
       if (resultado.sucesso && resultado.solicitacao.imagens) {
-        const imagensFormatadas = resultado.solicitacao.imagens.map(img => ({
+        const imagensFormatadas = resultado.solicitacao.imagens.map((img) => ({
           id: img.id,
           uri: `https://chamaservico.tds104-senac.online/uploads/solicitacoes/${img.caminho_imagem}`,
-          tipo: 'existente'
+          tipo: "existente",
         }));
         setImagensExistentes(imagensFormatadas);
       }
     } catch (error) {
-      console.error('Erro ao carregar imagens:', error);
+      console.error("Erro ao carregar imagens:", error);
     } finally {
       setCarregandoImagens(false);
     }
@@ -124,12 +130,15 @@ export default function NovaSolicitacao({ route, navigation }) {
     }
   };
 
+  
   const handleEnderecoCadastrado = (novoEnderecoId) => {
     if (novoEnderecoId) {
       setEnderecoId(novoEnderecoId);
     }
     carregarEnderecos();
   };
+
+
 
   // Funções para data/hora
   const onDateChange = (event, selectedDate) => {
@@ -150,13 +159,13 @@ export default function NovaSolicitacao({ route, navigation }) {
   };
 
   const formatarDataHora = (date) => {
-    if (!date) return '';
-    return date.toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    if (!date) return "";
+    return date.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -164,7 +173,8 @@ export default function NovaSolicitacao({ route, navigation }) {
     const novosErros = {};
     if (!titulo.trim()) novosErros.titulo = "Título é obrigatório.";
     if (!descricao.trim()) novosErros.descricao = "Descrição é obrigatória.";
-    if (!tipoServicoId) novosErros.tipoServicoId = "Selecione um tipo de serviço.";
+    if (!tipoServicoId)
+      novosErros.tipoServicoId = "Selecione um tipo de serviço.";
     if (!enderecoId) novosErros.enderecoId = "Selecione um endereço.";
 
     setErros(novosErros);
@@ -173,9 +183,13 @@ export default function NovaSolicitacao({ route, navigation }) {
 
   const selecionarImagens = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permissão necessária', 'Precisamos de acesso à sua galeria para selecionar imagens.');
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permissão necessária",
+          "Precisamos de acesso à sua galeria para selecionar imagens."
+        );
         return;
       }
 
@@ -183,7 +197,10 @@ export default function NovaSolicitacao({ route, navigation }) {
       const selectionLimit = 5 - totalImagens;
 
       if (selectionLimit <= 0) {
-        Alert.alert('Limite atingido', 'Você pode adicionar no máximo 5 imagens por solicitação.');
+        Alert.alert(
+          "Limite atingido",
+          "Você pode adicionar no máximo 5 imagens por solicitação."
+        );
         return;
       }
 
@@ -195,45 +212,41 @@ export default function NovaSolicitacao({ route, navigation }) {
       });
 
       if (!resultado.canceled && resultado.assets) {
-        const novasImagens = resultado.assets.map(asset => ({
+        const novasImagens = resultado.assets.map((asset) => ({
           ...asset,
-          tipo: 'nova'
+          tipo: "nova",
         }));
-        setImagens(prev => [...prev, ...novasImagens]);
+        setImagens((prev) => [...prev, ...novasImagens]);
       }
     } catch (error) {
-      console.error('Erro ao selecionar imagens:', error);
-      Alert.alert('Erro', 'Não foi possível selecionar as imagens');
+      console.error("Erro ao selecionar imagens:", error);
+      Alert.alert("Erro", "Não foi possível selecionar as imagens");
     }
   };
 
   const removerImagem = (index, tipo) => {
-    if (tipo === 'existente') {
-      setImagensExistentes(prev => prev.filter((_, i) => i !== index));
+    if (tipo === "existente") {
+      setImagensExistentes((prev) => prev.filter((_, i) => i !== index));
     } else {
-      setImagens(prev => prev.filter((_, i) => i !== index));
+      setImagens((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
   const removerImagemExistente = async (imagemId, index) => {
     try {
-      Alert.alert(
-        "Remover Imagem",
-        "Deseja remover esta imagem?",
-        [
-          { text: "Cancelar", style: "cancel" },
-          { 
-            text: "Remover", 
-            style: "destructive",
-            onPress: () => {
-              setImagensExistentes(prev => prev.filter((_, i) => i !== index));
-            }
-          }
-        ]
-      );
+      Alert.alert("Remover Imagem", "Deseja remover esta imagem?", [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Remover",
+          style: "destructive",
+          onPress: () => {
+            setImagensExistentes((prev) => prev.filter((_, i) => i !== index));
+          },
+        },
+      ]);
     } catch (error) {
-      console.error('Erro ao remover imagem:', error);
-      Alert.alert('Erro', 'Não foi possível remover a imagem');
+      console.error("Erro ao remover imagem:", error);
+      Alert.alert("Erro", "Não foi possível remover a imagem");
     }
   };
 
@@ -242,9 +255,10 @@ export default function NovaSolicitacao({ route, navigation }) {
       Alert.alert("Erro", "Preencha todos os campos obrigatórios.");
       return;
     }
-    const tipoNome = tiposServicos.find((t) => t.id === tipoServicoId)?.nome ?? '';
+    const tipoNome =
+      tiposServicos.find((t) => t.id === tipoServicoId)?.nome ?? "";
     const endereco = enderecos.find((e) => e.id === enderecoId);
-    const enderecoTexto = endereco ? endereco.nome : '';
+    const enderecoTexto = endereco ? endereco.nome : "";
     setResumo({
       tipoNome,
       enderecoTexto,
@@ -254,18 +268,18 @@ export default function NovaSolicitacao({ route, navigation }) {
       dataAtendimento: formatarDataHora(dataAtendimento),
       urgencia,
       imagens: [...imagensExistentes, ...imagens],
-      totalImagens: imagensExistentes.length + imagens.length
+      totalImagens: imagensExistentes.length + imagens.length,
     });
   };
 
   const limparFormulario = () => {
-    setTipoServicoId('');
-    setEnderecoId('');
-    setTitulo('');
-    setDescricao('');
-    setOrcamento('');
+    setTipoServicoId("");
+    setEnderecoId("");
+    setTitulo("");
+    setDescricao("");
+    setOrcamento("");
     setDataAtendimento(new Date());
-    setUrgencia('media');
+    setUrgencia("media");
     setImagens([]);
     setImagensExistentes([]);
     setResumo(null);
@@ -274,12 +288,16 @@ export default function NovaSolicitacao({ route, navigation }) {
 
   const salvarSolicitacao = async () => {
     if (!validarCamposObrigatorios()) {
-      Alert.alert("Erro", "Preencha todos os campos obrigatórios antes de publicar.");
+      Alert.alert(
+        "Erro",
+        "Preencha todos os campos obrigatórios antes de publicar."
+      );
       return;
     }
 
     setCarregando(true);
-
+    // console.log(' Tentando navegar para SolicitacoesTab...');
+    //console.log(' Rotas disponíveis no navigation:', navigation.getState()?.routes?.map(r => r.name));
     try {
       const dados = {
         cliente_id,
@@ -289,12 +307,15 @@ export default function NovaSolicitacao({ route, navigation }) {
         endereco_id: enderecoId,
         urgencia,
         orcamento_estimado: orcamento ? parseFloat(orcamento) : 0,
-        data_atendimento: dataAtendimento.toISOString().slice(0, 19).replace('T', ' '),
+        data_atendimento: dataAtendimento
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " "),
       };
 
-      console.log('Enviando dados:', dados);
-      console.log('Editando solicitação?', !!solicitacao?.id);
-      console.log('ID da solicitação:', solicitacao?.id);
+      // console.log("Enviando dados:", dados);
+      // console.log("Editando solicitação?", !!solicitacao?.id);
+      // console.log("ID da solicitação:", solicitacao?.id);
 
       let resultado;
       if (solicitacao?.id) {
@@ -306,38 +327,40 @@ export default function NovaSolicitacao({ route, navigation }) {
         resultado = await criarSolicitacao(dados, token);
       }
 
-      console.log('Resposta da API:', resultado);
+      console.log("Resposta da API:", resultado);
 
       if (resultado.sucesso) {
         const solicitacao_id = resultado.solicitacao_id || solicitacao?.id;
-        
+
         // Enviar novas imagens se houver
         if (imagens.length > 0 && solicitacao_id) {
           for (const img of imagens) {
-            if (img.uri && img.tipo === 'nova') {
+            if (img.uri && img.tipo === "nova") {
               await enviarImagemSolicitacao(solicitacao_id, img.uri, token);
             }
           }
         }
 
         Alert.alert(
-          "Sucesso", 
-          solicitacao ? "Solicitação atualizada com sucesso!" : "Solicitação publicada com sucesso!",
+          "Sucesso",
+          solicitacao
+            ? "Solicitação atualizada com sucesso!"
+            : "Solicitação publicada com sucesso!",
           [
             {
               text: "OK",
               onPress: () => {
                 limparFormulario();
-                navigation.navigate("MinhasSolicitacoes");
-              }
-            }
+                navigation.popToTop();
+              },
+            },
           ]
         );
       } else {
         Alert.alert("Erro", resultado.erro || "Erro ao salvar solicitação.");
       }
     } catch (error) {
-      console.error('Erro ao salvar solicitação:', error);
+      console.error("Erro ao salvar solicitação:", error);
       Alert.alert("Erro", "Erro ao conectar com o servidor.");
     } finally {
       setCarregando(false);
@@ -346,7 +369,10 @@ export default function NovaSolicitacao({ route, navigation }) {
 
   return (
     <LinearGradient colors={["#283579", "#0a112e"]} style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.titulo}>
           {solicitacao ? "Editar Solicitação" : "Nova Solicitação"}
         </Text>
@@ -367,7 +393,8 @@ export default function NovaSolicitacao({ route, navigation }) {
             value={descricao}
             onChangeText={(text) => {
               setDescricao(text);
-              if (erros.descricao) setErros((prev) => ({ ...prev, descricao: null }));
+              if (erros.descricao)
+                setErros((prev) => ({ ...prev, descricao: null }));
             }}
             placeholder="Detalhes do serviço necessário"
             multiline={true}
@@ -379,7 +406,8 @@ export default function NovaSolicitacao({ route, navigation }) {
             selectedValue={tipoServicoId}
             onValueChange={(value) => {
               setTipoServicoId(value);
-              if (erros.tipoServicoId) setErros((prev) => ({ ...prev, tipoServicoId: null }));
+              if (erros.tipoServicoId)
+                setErros((prev) => ({ ...prev, tipoServicoId: null }));
             }}
             options={tiposServicos}
             placeholder="Selecione o tipo de serviço"
@@ -393,7 +421,8 @@ export default function NovaSolicitacao({ route, navigation }) {
             selectedValue={enderecoId}
             onValueChange={(value) => {
               setEnderecoId(value);
-              if (erros.enderecoId) setErros((prev) => ({ ...prev, enderecoId: null }));
+              if (erros.enderecoId)
+                setErros((prev) => ({ ...prev, enderecoId: null }));
             }}
             options={enderecos}
             placeholder="Selecione um endereço"
@@ -414,30 +443,30 @@ export default function NovaSolicitacao({ route, navigation }) {
             placeholder="Ex: 150.00"
             keyboardType="numeric"
           />
-          
+
           {/* Data e Hora com DateTimePicker */}
           <View style={styles.dataHoraContainer}>
             <Text style={styles.dataHoraLabel}>Data e Hora de Atendimento</Text>
             <View style={styles.dataHoraBotoes}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.dataHoraBtn}
                 onPress={() => setShowDatePicker(true)}
               >
                 <Ionicons name="calendar-outline" size={20} color="#283579" />
                 <Text style={styles.dataHoraBtnText}>
-                  {dataAtendimento.toLocaleDateString('pt-BR')}
+                  {dataAtendimento.toLocaleDateString("pt-BR")}
                 </Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 style={styles.dataHoraBtn}
                 onPress={() => setShowTimePicker(true)}
               >
                 <Ionicons name="time-outline" size={20} color="#283579" />
                 <Text style={styles.dataHoraBtnText}>
-                  {dataAtendimento.toLocaleTimeString('pt-BR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
+                  {dataAtendimento.toLocaleTimeString("pt-BR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
                   })}
                 </Text>
               </TouchableOpacity>
@@ -468,7 +497,7 @@ export default function NovaSolicitacao({ route, navigation }) {
             options={[
               { label: "Baixa", value: "baixa" },
               { label: "Média", value: "media" },
-              { label: "Alta", value: "alta" }
+              { label: "Alta", value: "alta" },
             ]}
             selected={urgencia}
             onSelect={setUrgencia}
@@ -476,12 +505,12 @@ export default function NovaSolicitacao({ route, navigation }) {
         </SecaoFormulario>
 
         <SecaoFormulario titulo="Imagens">
-          <Botao 
-            title="Selecionar Novas Imagens" 
-            onPress={selecionarImagens} 
-            variante="outline" 
+          <Botao
+            title="Selecionar Novas Imagens"
+            onPress={selecionarImagens}
+            variante="outline"
           />
-          
+
           {/* Imagens Existentes */}
           {imagensExistentes.length > 0 && (
             <View style={styles.imagensContainer}>
@@ -491,8 +520,11 @@ export default function NovaSolicitacao({ route, navigation }) {
               <ScrollView horizontal style={styles.imagemPreviewContainer}>
                 {imagensExistentes.map((img, index) => (
                   <View key={`existente-${img.id}`} style={styles.imagemItem}>
-                    <Image source={{ uri: img.uri }} style={styles.imagemPreview} />
-                    <TouchableOpacity 
+                    <Image
+                      source={{ uri: img.uri }}
+                      style={styles.imagemPreview}
+                    />
+                    <TouchableOpacity
                       style={styles.removerImagemBtn}
                       onPress={() => removerImagemExistente(img.id, index)}
                     >
@@ -513,10 +545,13 @@ export default function NovaSolicitacao({ route, navigation }) {
               <ScrollView horizontal style={styles.imagemPreviewContainer}>
                 {imagens.map((img, index) => (
                   <View key={`nova-${index}`} style={styles.imagemItem}>
-                    <Image source={{ uri: img.uri }} style={styles.imagemPreview} />
-                    <TouchableOpacity 
+                    <Image
+                      source={{ uri: img.uri }}
+                      style={styles.imagemPreview}
+                    />
+                    <TouchableOpacity
                       style={styles.removerImagemBtn}
-                      onPress={() => removerImagem(index, 'nova')}
+                      onPress={() => removerImagem(index, "nova")}
                     >
                       <Text style={styles.removerImagemTexto}>×</Text>
                     </TouchableOpacity>
@@ -526,7 +561,7 @@ export default function NovaSolicitacao({ route, navigation }) {
             </View>
           )}
 
-          {(imagensExistentes.length === 0 && imagens.length === 0) && (
+          {imagensExistentes.length === 0 && imagens.length === 0 && (
             <Text style={styles.semImagensTexto}>
               Nenhuma imagem selecionada. Você pode adicionar até 5 imagens.
             </Text>
@@ -541,22 +576,32 @@ export default function NovaSolicitacao({ route, navigation }) {
           </Text>
         </SecaoFormulario>
 
-        <Botao 
-          title="Gerar Resumo" 
-          onPress={gerarResumo} 
-          variante="secundario" 
+        <Botao
+          title="Gerar Resumo"
+          onPress={gerarResumo}
+          variante="secundario"
         />
 
         {resumo && (
           <SecaoFormulario titulo="Resumo da Solicitação">
             <Text style={styles.resumoTexto}>Tipo: {resumo.tipoNome}</Text>
-            <Text style={styles.resumoTexto}>Endereço: {resumo.enderecoTexto}</Text>
+            <Text style={styles.resumoTexto}>
+              Endereço: {resumo.enderecoTexto}
+            </Text>
             <Text style={styles.resumoTexto}>Título: {resumo.titulo}</Text>
-            <Text style={styles.resumoTexto}>Descrição: {resumo.descricao}</Text>
-            <Text style={styles.resumoTexto}>Orçamento: R$ {resumo.orcamento || '0,00'}</Text>
-            <Text style={styles.resumoTexto}>Data: {resumo.dataAtendimento}</Text>
+            <Text style={styles.resumoTexto}>
+              Descrição: {resumo.descricao}
+            </Text>
+            <Text style={styles.resumoTexto}>
+              Orçamento: R$ {resumo.orcamento || "0,00"}
+            </Text>
+            <Text style={styles.resumoTexto}>
+              Data: {resumo.dataAtendimento}
+            </Text>
             <Text style={styles.resumoTexto}>Urgência: {resumo.urgencia}</Text>
-            <Text style={styles.resumoTexto}>Imagens: {resumo.totalImagens}</Text>
+            <Text style={styles.resumoTexto}>
+              Imagens: {resumo.totalImagens}
+            </Text>
           </SecaoFormulario>
         )}
 
@@ -598,16 +643,16 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   imagensTitulo: {
-    color: '#ffffff',
+    color: "#ffffff",
     marginBottom: 8,
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   imagemPreviewContainer: {
     marginVertical: 8,
   },
   imagemItem: {
-    position: 'relative',
+    position: "relative",
     marginRight: 12,
   },
   imagemPreview: {
@@ -616,19 +661,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   removerImagemBtn: {
-    position: 'absolute',
+    position: "absolute",
     top: -8,
     right: -8,
-    backgroundColor: '#dc3545',
+    backgroundColor: "#dc3545",
     width: 24,
     height: 24,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   removerImagemTexto: {
-    color: '#ffffff',
-    fontWeight: 'bold',
+    color: "#ffffff",
+    fontWeight: "bold",
     fontSize: 16,
   },
   resumoTexto: {
@@ -640,45 +685,70 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   dataHoraLabel: {
-    color: '#ffffff',
+    color: "#ffffff",
     marginBottom: 8,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   dataHoraBotoes: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     gap: 12,
   },
   dataHoraBtn: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
     padding: 12,
     borderRadius: 8,
     gap: 8,
   },
   dataHoraBtnText: {
-    color: '#283579',
+    color: "#283579",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   carregandoTexto: {
-    color: '#ffffff',
-    textAlign: 'center',
+    color: "#ffffff",
+    textAlign: "center",
     marginTop: 8,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   semImagensTexto: {
-    color: '#cccccc',
-    textAlign: 'center',
+    color: "#cccccc",
+    textAlign: "center",
     marginTop: 16,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   infoImagens: {
-    color: '#ffffff',
-    textAlign: 'center',
+    color: "#ffffff",
+    textAlign: "center",
     marginTop: 8,
     fontSize: 12,
+  },
+  enderecoHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  enderecoLabel: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  recarregarBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    gap: 4,
+  },
+  recarregarTexto: {
+    color: "#283579",
+    fontSize: 12,
+    fontWeight: "500",
   },
 });

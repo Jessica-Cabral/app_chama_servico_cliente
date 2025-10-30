@@ -165,15 +165,14 @@ export default function ModalEndereco({
       Alert.alert('Erro', 'Preencha todos os campos obrigatórios do endereço');
       return;
     }
-
-  // DEBUG CRÍTICO - verifique se os dados chegam corretamente
-  console.log('=== DEBUG MODAL ENDERECO ===');
-  console.log('clienteId recebido:', clienteId);
-  console.log('clienteId tipo:', typeof clienteId);
-  console.log('token recebido:', token ? 'PRESENTE' : 'AUSENTE');
-  console.log('token valor:', token);
-  console.log('dados endereço:', novoEndereco);
-  console.log('============================');
+    // // DEBUG para verificar se os dados chegam corretamente
+    // console.log('=== DEBUG MODAL ENDERECO ===');
+    // console.log('clienteId recebido:', clienteId);
+    // console.log('clienteId tipo:', typeof clienteId);
+    // console.log('token recebido:', token ? 'PRESENTE' : 'AUSENTE');
+    // console.log('token valor:', token);
+    // console.log('dados endereço:', novoEndereco);
+    // console.log('============================');
 
   if (!clienteId) {
     Alert.alert('Erro', 'ID do cliente não encontrado');
@@ -195,7 +194,7 @@ export default function ModalEndereco({
       bairro: novoEndereco.bairro,
       cidade: novoEndereco.cidade,
       estado: novoEndereco.estado,
-      principal: novoEndereco.principal
+      //principal: novoEndereco.principal
     };
 
     console.log('Dados enviados para API:', dadosEndereco);
