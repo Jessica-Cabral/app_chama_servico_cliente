@@ -296,7 +296,6 @@ export default function NovaSolicitacao({ route, navigation }) {
     }
 
     setCarregando(true);
-    // console.log(' Tentando navegar para SolicitacoesTab...');
     //console.log(' Rotas disponíveis no navigation:', navigation.getState()?.routes?.map(r => r.name));
     try {
       const dados = {
@@ -312,7 +311,7 @@ export default function NovaSolicitacao({ route, navigation }) {
           .slice(0, 19)
           .replace("T", " "),
       };
-
+      // Para teste
       // console.log("Enviando dados:", dados);
       // console.log("Editando solicitação?", !!solicitacao?.id);
       // console.log("ID da solicitação:", solicitacao?.id);
@@ -332,7 +331,7 @@ export default function NovaSolicitacao({ route, navigation }) {
       if (resultado.sucesso) {
         const solicitacao_id = resultado.solicitacao_id || solicitacao?.id;
 
-        // Enviar novas imagens se houver
+        // Enviar novas imagens, se houver
         if (imagens.length > 0 && solicitacao_id) {
           for (const img of imagens) {
             if (img.uri && img.tipo === "nova") {

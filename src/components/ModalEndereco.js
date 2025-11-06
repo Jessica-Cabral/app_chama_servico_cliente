@@ -123,42 +123,6 @@ export default function ModalEndereco({
     return Object.keys(novosErros).length === 0;
   };
 
-  // const salvarNovoEndereco = async () => {
-  //   if (!validarEndereco()) {
-  //     Alert.alert('Erro', 'Preencha todos os campos obrigatórios do endereço');
-  //     return;
-  //   }
-
-  //   try {
-  //     const dadosEndereco = {
-  //       cliente_id: clienteId,
-  //       cep: novoEndereco.cep.replace(/\D/g, ''),
-  //       logradouro: novoEndereco.logradouro,
-  //       numero: novoEndereco.numero,
-  //       complemento: novoEndereco.complemento,
-  //       bairro: novoEndereco.bairro,
-  //       cidade: novoEndereco.cidade,
-  //       estado: novoEndereco.estado,
-  //       principal: novoEndereco.principal
-  //     };
-
-  //     const resultado = await cadastrarEndereco(dadosEndereco, token);
-
-  //     if (resultado.sucesso) {
-  //       Alert.alert('Sucesso', 'Endereço cadastrado com sucesso!');
-  //       onEnderecoCadastrado(resultado.endereco_id);
-  //       limparFormulario();
-  //       onClose();
-  //     } else {
-  //       Alert.alert('Erro', resultado.erro || 'Erro ao cadastrar endereço');
-  //     }
-  //   } catch (error) {
-  //     console.error('Erro ao salvar endereço:', error);
-  //     Alert.alert('Erro', 'Erro ao conectar com o servidor');
-  //   }
-  // };
-
-  //para teste
 
   const salvarNovoEndereco = async () => {
     if (!validarEndereco()) {
@@ -194,6 +158,7 @@ export default function ModalEndereco({
       bairro: novoEndereco.bairro,
       cidade: novoEndereco.cidade,
       estado: novoEndereco.estado,
+      //Não é obrigatório
       //principal: novoEndereco.principal
     };
 

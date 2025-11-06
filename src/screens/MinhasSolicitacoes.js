@@ -624,7 +624,7 @@ const MinhasSolicitacoes = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header com botão de nova solicitação */}
+      {/* Cabeçalho / header com botão de nova solicitação */}
       <LinearGradient colors={["#283579", "#0a112e"]} style={styles.header}>
         <Text style={styles.titulo}>Minhas Solicitações</Text>
         <View style={styles.headerAcoes}>
@@ -734,8 +734,6 @@ const MinhasSolicitacoes = ({ navigation }) => {
     </View>
   );
 };
-
-// ... (os estilos permanecem EXATAMENTE os mesmos)
 const styles = StyleSheet.create({
   container: {
     flex: 1,

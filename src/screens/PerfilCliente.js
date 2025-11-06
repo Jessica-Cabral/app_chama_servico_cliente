@@ -724,7 +724,7 @@ const PerfilCliente = ({ navigation }) => {
         <ModalEndereco
           visible={modalEnderecoVisible}
           onClose={() => setModalEnderecoVisible(false)}
-          clienteId={usuario?.id}  // Mude de usuarioId para clienteId
+          clienteId={usuario?.id} 
           token={token}
           onEnderecoCadastrado={handleEnderecoCadastrado}
         />
@@ -732,7 +732,6 @@ const PerfilCliente = ({ navigation }) => {
   );
 };
 
-// Os styles permanecem os mesmos...
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -178,23 +178,11 @@ function AuthRoutes() {
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="CadastroCliente" component={CadastroCliente} />
-      {/* Adicionar NovaSolicitacao também nas rotas de auth para evitar erro de navegação */}
-      {/* <Stack.Screen 
-        name="NovaSolicitacao" 
-        component={NovaSolicitacao} 
-        options={{ 
-          headerShown: true,
-          title: 'Nova Solicitação',
-          headerStyle: { backgroundColor: '#0a112e' },
-          headerTintColor: '#fff',
-          headerTitleAlign: 'center',
-        }}
-      /> */}
     </Stack.Navigator>
   );
 }
 
-// Componente que decide qual rota mostrar
+// define qual rota mostrar
 function Rotas() {
   const { usuario, carregando } = useContext(AuthContext);
 

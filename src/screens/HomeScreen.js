@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 140, // Espaço extra para os botões
+    paddingBottom: 140,
   },
   cabecalhoChama: {
     alignItems: "center",
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "47%",
     height: screenHeight * 0.22, // 22% da altura da tela
-    minHeight: 160, // Altura mínima para telas muito pequenas
+    minHeight: 160, 
     shadowColor: "#0a112e",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,

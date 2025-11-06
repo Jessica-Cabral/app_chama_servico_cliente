@@ -51,7 +51,7 @@ export async function buscarEnderecoPorCEP(cep) {
   }
 }
 
-// CADASTRO COMPLETO DE ENDEREÇO - VERSÃO QUE FUNCIONOU
+// Cadastro do endereço
 export async function cadastrarEndereco(dados, token) {
   try {
     console.log('📤 Enviando dados para cadastro:', dados);
@@ -64,22 +64,15 @@ export async function cadastrarEndereco(dados, token) {
       },
       body: JSON.stringify(dados)
     });
-
-    console.log('📥 Status da resposta:', response.status);
     
     const responseText = await response.text();
-    console.log('📥 Resposta bruta:', responseText);
 
     let data;
     try {
       data = JSON.parse(responseText);
     } catch (e) {
-      console.error('❌ Erro ao parsear JSON:', e);
       return { erro: 'Resposta inválida do servidor' };
     }
-
-    console.log('📥 Resposta parseada:', data);
-
     if (!response.ok) {
       return { 
         erro: data.erro || `Erro HTTP ${response.status}: ${response.statusText}` 
@@ -89,7 +82,6 @@ export async function cadastrarEndereco(dados, token) {
     return data;
 
   } catch (error) {
-    console.error('❌ Erro na requisição:', error);
     return { erro: `Erro de conexão: ${error.message}` };
   }
 }

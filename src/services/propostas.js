@@ -3,7 +3,7 @@ const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi
 
 export async function buscarPropostas(cliente_id, filtros = {}) {
   try {
-    // Construir query string para filtros
+    // construir query string para filtros
     const params = new URLSearchParams({
       cliente_id: cliente_id.toString(),
       ...filtros

@@ -108,7 +108,7 @@ export async function excluirSolicitacao(solicitacao_id, cliente_id, token) {
     return { erro: 'Erro ao excluir solicitação' };
   }
 }
-
+//ainda não está funcional - Preciso avaliar uso de FTP para enviar as imagens para o servidor
 export async function enviarImagemSolicitacao(solicitacao_id, imagemUri, token) {
   const formData = new FormData();
   formData.append('solicitacao_id', solicitacao_id);

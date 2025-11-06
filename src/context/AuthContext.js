@@ -1,4 +1,4 @@
-// src/context/AuthContext.js
+//Identica o usuario logado | 
 import { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
