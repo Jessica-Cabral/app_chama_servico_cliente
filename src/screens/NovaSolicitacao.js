@@ -377,6 +377,18 @@ export default function NovaSolicitacao({ route, navigation }) {
         </Text>
 
         <SecaoFormulario titulo="Informações do Serviço">
+          <SelectCampo
+            label="Tipo de Serviço *"
+            selectedValue={tipoServicoId}
+            onValueChange={(value) => {
+              setTipoServicoId(value);
+              if (erros.tipoServicoId)
+                setErros((prev) => ({ ...prev, tipoServicoId: null }));
+            }}
+            options={tiposServicos}
+            placeholder="Selecione o tipo de serviço"
+            erro={erros.tipoServicoId}
+          />
           <InputCampo
             label="Título *"
             value={titulo}
@@ -400,18 +412,7 @@ export default function NovaSolicitacao({ route, navigation }) {
             numberOfLines={4}
             erro={erros.descricao}
           />
-          <SelectCampo
-            label="Tipo de Serviço *"
-            selectedValue={tipoServicoId}
-            onValueChange={(value) => {
-              setTipoServicoId(value);
-              if (erros.tipoServicoId)
-                setErros((prev) => ({ ...prev, tipoServicoId: null }));
-            }}
-            options={tiposServicos}
-            placeholder="Selecione o tipo de serviço"
-            erro={erros.tipoServicoId}
-          />
+          
         </SecaoFormulario>
 
         <SecaoFormulario titulo="Endereço do serviço">
@@ -684,7 +685,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   dataHoraLabel: {
-    color: "#ffffff",
+    color: "#283579",
     marginBottom: 8,
     fontWeight: "bold",
   },

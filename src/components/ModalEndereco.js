@@ -332,7 +332,7 @@ export default function ModalEndereco({
                 style={styles.botaoModal}
               />
               <Botao
-                title="Salvar Endereço"
+                title="Salvar"
                 onPress={salvarNovoEndereco}
                 variante="primario"
                 style={styles.botaoModal}

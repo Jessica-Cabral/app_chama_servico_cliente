@@ -1,7 +1,5 @@
 // API para gerenciar a autenticação dos cliente
 
-
-//const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/auth.php';
 const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/login';
 //const { token } = useContext(AuthContext);
 
