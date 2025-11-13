@@ -42,11 +42,11 @@ const carregarDados = async () => {
         return;
       }
 
-      console.log('👤 Usuário ID:', usuario.id);
-      console.log('🔑 Token disponível:', !!token);
+      // console.log('👤 Usuário ID:', usuario.id);
+      // console.log('🔑 Token disponível:', !!token);
 
       const dados = await carregarDadosDashboard(usuario.id, token);
-      console.log('📊 Dados retornados do serviço:', dados);
+      //console.log('📊 Dados retornados do serviço:', dados);
 
       if (!dados) {
         throw new Error('Serviço retornou dados vazios');
@@ -229,7 +229,7 @@ const carregarDados = async () => {
           <View style={styles.menuGrid}>
             <TouchableOpacity 
               style={styles.menuCard}
-              onPress={() => navigation.navigate('MinhasSolicitacoes')}
+              onPress={() => navigation.navigate('Solicitacoes')}
             >
               <View style={[styles.menuCardIcon, { backgroundColor: '#e3f2fd' }]}>
                 <Ionicons name="document-text-outline" size={24} color="#283579" />

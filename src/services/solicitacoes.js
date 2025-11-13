@@ -129,10 +129,10 @@ export async function enviarImagemSolicitacao(solicitacao_id, imagemUri, token) 
     });
 
     const resultado = await response.json();
-    console.log('Resultado do envio da imagem:', resultado);
+    //console.log('Resultado do envio da imagem:', resultado);
     return resultado;
   } catch (error) {
-    console.error('Erro ao enviar imagem:', error);
+    //console.error('Erro ao enviar imagem:', error);
     return { erro: 'Erro ao enviar imagem' };
   }
 }

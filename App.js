@@ -69,6 +69,10 @@ function DashStack() {
         name="PerfilCliente"
         component={PerfilCliente}
       />
+       <Stack.Screen
+        name="MinhasSolicitacoes"
+        component={MinhasSolicitacoes}
+      />
     </Stack.Navigator>
   );
 }
