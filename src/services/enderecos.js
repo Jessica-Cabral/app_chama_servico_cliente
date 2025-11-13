@@ -1,4 +1,4 @@
-// API para gerenciamento de endereço
+// Serviço de conexão - API para gerenciamento de endereço
 
 const API_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/perfil';
 const ENDERECO_URL = 'https://chamaservico.tds104-senac.online/api/cliente/ClienteApi.php/enderecos';
